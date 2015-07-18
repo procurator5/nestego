@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/options">
+        <file>preferences-desktop-display.png</file>
+        <file>knetattach.png</file>
+        <file>configure.png</file>
+        <file>media-playlist-repeat.png</file>
+        <file>code-context.png</file>
+        <file>document-open.png</file>
+        <file>document-save-all.png</file>
+    </qresource>
+</RCC>
