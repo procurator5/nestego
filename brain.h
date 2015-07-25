@@ -38,14 +38,12 @@
 **
 ****************************************************************************/
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef BRAIN_H
+#define BRAIN_H
 
 #include <QGraphicsItem>
 #include <QList>
 #include <QGraphicsView>
-#include <QByteArray>
-
 #include "node.h"
 
 class Edge;
@@ -54,10 +52,10 @@ class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 //! [0]
-class Buffer : public Node
+class Brain : public Node
 {
 public:
-    Buffer(QGraphicsView *graphWidget);
+    Brain(QGraphicsView *graphWidget);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -68,23 +66,6 @@ public:
     void calculateForces();
     bool advance();
 
-    void setBufferSize(unsigned int bs){
-        buffer_size = bs;
-    };
-
-    unsigned int getBufferSize(){
-        return buffer_size;
-    };
-
-    void setDiff(QByteArray arr){
-        diff.clear();
-        diff.push_back(arr);
-    }
-
-    /**
-     * @brief Возвращает размер виджета, отображающего буффер
-     * @return QRectF
-     */
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -99,8 +80,6 @@ private:
     QList<Edge *> edgeList;
     QPointF newPos;
     QGraphicsView *graph;
-    unsigned int buffer_size;
-    QByteArray diff;
 };
 //! [0]
 

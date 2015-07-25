@@ -56,7 +56,7 @@ class Node : public QGraphicsItem
 public:
     Node(QGraphicsView *graphWidget);
 
-    void addEdge(Edge *edge);
+    virtual void addEdge(Edge *edge);
     QList<Edge *> edges() const;
 
     enum { Type = UserType + 1 };

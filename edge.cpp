@@ -73,7 +73,8 @@ Node *Edge::destNode() const
 }
 //! [1]
 
-//! [2]
+#include <QDebug>
+
 void Edge::adjust()
 {
     if (!source || !dest)

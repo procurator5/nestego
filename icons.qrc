@@ -7,5 +7,10 @@
         <file>code-context.png</file>
         <file>document-open.png</file>
         <file>document-save-all.png</file>
+        <file>draw-bezier-curves.png</file>
+    </qresource>
+    <qresource prefix="/items">
+        <file>brain.png</file>
+        <file>go-down.png</file>
     </qresource>
 </RCC>

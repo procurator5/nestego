@@ -38,15 +38,15 @@
 **
 ****************************************************************************/
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef ANALYSE_H
+#define ANALYSE_H
 
 #include <QGraphicsItem>
 #include <QList>
 #include <QGraphicsView>
-#include <QByteArray>
 
 #include "node.h"
+#include "fann.h"
 
 class Edge;
 QT_BEGIN_NAMESPACE
@@ -54,13 +54,22 @@ class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 //! [0]
-class Buffer : public Node
+class Analyse : public Node
 {
 public:
-    Buffer(QGraphicsView *graphWidget);
+    Analyse(QGraphicsView *graphWidget);
+
+    /**
+     * @brief Создается нейронная сеть для ализа данных
+     * @return bool создание сети прошло успешно/неуспешно
+     */
+    bool createNeuralNetwork();
+
+    int trainFann(QByteArray input, QByteArray diff);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
+
 
     enum { Type = UserType + 1 };
     int type() const { return Type; }
@@ -68,23 +77,14 @@ public:
     void calculateForces();
     bool advance();
 
-    void setBufferSize(unsigned int bs){
-        buffer_size = bs;
+    void setName(QString nm){
+        name = nm;
     };
 
-    unsigned int getBufferSize(){
-        return buffer_size;
+    QString getName(){
+        return name;
     };
 
-    void setDiff(QByteArray arr){
-        diff.clear();
-        diff.push_back(arr);
-    }
-
-    /**
-     * @brief Возвращает размер виджета, отображающего буффер
-     * @return QRectF
-     */
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -99,8 +99,28 @@ private:
     QList<Edge *> edgeList;
     QPointF newPos;
     QGraphicsView *graph;
-    unsigned int buffer_size;
-    QByteArray diff;
+    /**
+     * @brief Имя анализатора
+     */
+    QString name;
+    /**
+     * @brief Нейронная сеть из библиотеки LIBFANN
+     */
+
+    struct fann *neural;
+    /**
+     * @brief Количество байт на входе нейронной сети
+     */
+    unsigned int num_input;
+
+    /**
+     * @brief Создание нейронной сети в стиле LibFann
+     * @return
+     */
+    bool createLibFann();
+
+    unsigned long good;
+    unsigned long bad;
 };
 //! [0]
 

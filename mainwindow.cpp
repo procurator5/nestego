@@ -10,6 +10,8 @@
 #include "vlineeditdelegate.h"
 #include "edge.h"
 #include "vabufferform.h"
+#include "vanalyserform.h"
+#include "vedgedialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -28,47 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&scene, SIGNAL(sceneRectChanged( const QRectF & )), this, SLOT(bufferResized( const QRectF & )));
 
-    Node *node1 = new Node(ui->graphicsView);
-    Node *node2 = new Node(ui->graphicsView);
-    Node *node3 = new Node(ui->graphicsView);
-    Node *node4 = new Node(ui->graphicsView);
-    Node *centerNode = new Node(ui->graphicsView);
-    Node *node6 = new Node(ui->graphicsView);
-    Node *node7 = new Node(ui->graphicsView);
-    Node *node8 = new Node(ui->graphicsView);
-    Node *node9 = new Node(ui->graphicsView);
-    scene.addItem(node1);
-    scene.addItem(node2);
-    scene.addItem(node3);
-    scene.addItem(node4);
-    scene.addItem(centerNode);
-    scene.addItem(node6);
-    scene.addItem(node7);
-    scene.addItem(node8);
-    scene.addItem(node9);
-    scene.addItem(new Edge(node1, node2));
-    scene.addItem(new Edge(node2, node3));
-    scene.addItem(new Edge(node2, centerNode));
-    scene.addItem(new Edge(node3, node6));
-    scene.addItem(new Edge(node4, node1));
-    scene.addItem(new Edge(node4, centerNode));
-    scene.addItem(new Edge(centerNode, node6));
-    scene.addItem(new Edge(centerNode, node8));
-    scene.addItem(new Edge(node6, node9));
-    scene.addItem(new Edge(node7, node4));
-    scene.addItem(new Edge(node8, node7));
-    scene.addItem(new Edge(node9, node8));
-
-    node1->setPos(-50, -50);
-    node2->setPos(0, -50);
-    node3->setPos(50, -50);
-    node4->setPos(-50, 0);
-    centerNode->setPos(0, 0);
-    node6->setPos(50, 0);
-    node7->setPos(-50, 50);
-    node8->setPos(0, 50);
-    node9->setPos(50, 50);
-
+    brain = new Brain(ui->graphicsView);
+    scene.addItem(brain);
+    brain->setPos(0, 50);
 
 }
 
@@ -85,8 +49,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_action_addAnalyze_triggered()
 {
+    vAnalyserForm af;
+    af.exec();
  //   scene.addItem(new vGraphicsProxyWidget);
-    Node *node = new Node(ui->graphicsView);
+    Analyse *node = new Analyse(ui->graphicsView);
     scene.addItem(node);
     node->setPos(0, 0);
     nodeList.append(node);
@@ -156,9 +122,44 @@ void MainWindow::on_action_saveProject_triggered()
     for(QList<Buffer*>::iterator it = bufferList.begin(); it!=bufferList.end(); ++it){
         settings.beginGroup(QString("buffer%1").arg(i++));
         settings.setValue("size", (*it)->getBufferSize());
+        settings.setValue("x", (*it)->pos().x());
+        settings.setValue("y", (*it)->pos().y());
+        //Сохраняем выходные связи
+        QList <Edge*> edges = (*it)->edges();
+        for(QList<Edge*>::iterator et = edges.begin(); et!=edges.end(); ++et){
+            Analyse* an = dynamic_cast <Analyse*> ((*et)->destNode());
+            if(an!=NULL)
+                settings.setValue("edge", an->getName());
+        }
         settings.endGroup();
     }
     settings.endGroup();
+
+    //Сохраняем конфигурацию буферов
+    settings.beginGroup("nodes");
+    for(QList<Analyse*>::iterator it = nodeList.begin(); it!=nodeList.end(); ++it){
+        settings.beginGroup((*it)->getName());
+        settings.setValue("x", (*it)->pos().x());
+        settings.setValue("y", (*it)->pos().y());
+        QList <Edge*> edges = (*it)->edges();
+        for(QList<Edge*>::iterator et = edges.begin(); et!=edges.end(); ++et){
+            Analyse* an = dynamic_cast <Analyse*> ((*et)->destNode());
+            if(an!=NULL)
+                settings.setValue("edge", an->getName());
+            Brain* br = dynamic_cast <Brain*> ((*et)->destNode());
+            if(br != NULL)
+                settings.setValue("edge", "brain");
+        }
+        settings.endGroup();
+
+    }
+    settings.endGroup();
+
+    settings.beginGroup("brain");
+    settings.setValue("x", brain->pos().x());
+    settings.setValue("y", brain->pos().y());
+    settings.endGroup();
+
 }
 
 void MainWindow::on_action_OpenProject_triggered()
@@ -173,7 +174,7 @@ void MainWindow::on_action_OpenProject_triggered()
     clearModeSelectin();
     QSettings settings(fileName, QSettings::IniFormat);
     settings.beginGroup("source");
-    //Отпределяем тип контрольного примера
+    //Определяем тип контрольного примера
     if(settings.value("type", QVariant("undef"))=="program"){
         QTreeWidgetItem * item = ui->treeWidget->topLevelItem(0);
         item->setText(3, "X");
@@ -206,22 +207,63 @@ void MainWindow::on_action_OpenProject_triggered()
     settings.endGroup();
 
     bufferList.clear();
+
     scene.clear();
+
+    brain = new Brain(ui->graphicsView);
+    scene.addItem(brain);
+
+    settings.beginGroup("brain");
+    brain->setPos(settings.value("x").toReal(), settings.value("y").toReal());
+    settings.endGroup();
+
 
     //Загружаем изображение буферов
     settings.beginGroup("buffers");
     QStringList chgr = settings.childGroups();
-    int i = 0;
     for(QStringList::iterator it = chgr.begin(); it!=chgr.end();++it){
         settings.beginGroup(*it);
         Buffer* buf = new Buffer(ui->graphicsView);
         buf->setBufferSize(settings.value("size").toInt());
         scene.addItem(buf);
-        buf->setPos(-50 + 40 * ++i, -50 );
+        buf->setPos(settings.value("x").toReal(), settings.value("y").toReal() );
+        //
         settings.endGroup();
         bufferList.append(buf);
     }
     settings.endGroup();
+
+
+    //Загружаем изображение анализаторов
+    settings.beginGroup("nodes");
+    chgr = settings.childGroups();
+    for(QStringList::iterator it = chgr.begin(); it!=chgr.end();++it){
+        settings.beginGroup(*it);
+        Analyse* an = new Analyse(ui->graphicsView);
+        an->setName(*it);
+        scene.addItem(an);
+        an->setPos(settings.value("x").toReal(), settings.value("y").toReal() );
+        settings.endGroup();
+        nodeList.append(an);
+    }
+    settings.endGroup();
+
+    //Загружаем связи между элементами
+    settings.beginGroup("buffers");
+    chgr = settings.childGroups();
+    int i = 0;
+    for(QStringList::iterator it = chgr.begin(); it!=chgr.end();++it){
+        settings.beginGroup(*it);
+        QString name = settings.value("edge").toString();
+        for(QList <Analyse*>::iterator bt = nodeList.begin(); bt!=nodeList.end(); ++bt)
+            if((*bt)->getName()==name){
+                scene.addItem(new Edge(bufferList.at(i), *bt));
+            }
+        settings.endGroup();
+        i++;
+    }
+    settings.endGroup();
+
 }
 
 
@@ -256,3 +298,27 @@ void MainWindow::on_action_addBuffer_triggered()
     bufferList.append(buffer);
 }
 
+#include <QMap>
+void MainWindow::on_action_addEdge_triggered()
+{
+    vEdgeDialog ed;
+
+    QMap <QString, Node*> nodes;
+    int i=0;
+    for(QList <Buffer*>::iterator it = bufferList.begin(); it!=bufferList.end();++it){
+        nodes.insert(QString("Buffer%1 (%2)").arg(i++).arg((*it)->getBufferSize()), *it);
+    }
+
+    for(QList <Analyse*>::iterator it = nodeList.begin(); it!=nodeList.end();++it){
+        nodes.insert((*it)->getName(), *it);
+    }
+
+    nodes.insert(QString::fromLocal8Bit("Выход анализатора") , brain);
+
+    ed.loadNodesList(nodes);
+    ed.exec();
+
+    Edge *edge = ed.getEdge();
+    scene.addItem(edge);
+
+}

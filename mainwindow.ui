@@ -255,8 +255,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>408</width>
-             <height>397</height>
+             <width>98</width>
+             <height>96</height>
             </rect>
            </property>
            <attribute name="label">
@@ -316,7 +316,16 @@
     <addaction name="action_OpenProject"/>
     <addaction name="action_saveProject"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Добавить</string>
+    </property>
+    <addaction name="action_addBuffer"/>
+    <addaction name="action_addAnalyze"/>
+    <addaction name="action_addEdge"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -330,6 +339,7 @@
    <addaction name="separator"/>
    <addaction name="action_addBuffer"/>
    <addaction name="action_addAnalyze"/>
+   <addaction name="action_addEdge"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_addAnalyze">
@@ -366,6 +376,15 @@
    </property>
    <property name="text">
     <string>Добавить буфер</string>
+   </property>
+  </action>
+  <action name="action_addEdge">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/options/draw-bezier-curves.png</normaloff>:/options/draw-bezier-curves.png</iconset>
+   </property>
+   <property name="text">
+    <string>Добавить связь</string>
    </property>
   </action>
  </widget>

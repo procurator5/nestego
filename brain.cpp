@@ -1,4 +1,5 @@
 /****************************************************************************
+
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
@@ -44,35 +45,34 @@
 #include <QStyleOption>
 
 #include "edge.h"
-#include "buffer.h"
+#include "brain.h"
 
 //! [0]
-Buffer::Buffer(QGraphicsView *graphWidget)
+Brain::Brain(QGraphicsView *graphWidget)
     : Node(graphWidget)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
-    buffer_size = 2;
 }
 //! [0]
 
 //! [1]
-void Buffer::addEdge(Edge *edge)
+void Brain::addEdge(Edge *edge)
 {
     edgeList << edge;
     edge->adjust();
 }
 
-QList<Edge *> Buffer::edges() const
+QList<Edge *> Brain::edges() const
 {
     return edgeList;
 }
 //! [1]
 
 //! [2]
-void Buffer::calculateForces()
+void Brain::calculateForces()
 {
     if (!scene() || scene()->mouseGrabberItem() == this) {
         newPos = pos();
@@ -85,7 +85,7 @@ void Buffer::calculateForces()
     qreal xvel = 0;
     qreal yvel = 0;
     foreach (QGraphicsItem *item, scene()->items()) {
-        Buffer *node = qgraphicsitem_cast<Buffer *>(item);
+        Brain *node = qgraphicsitem_cast<Brain *>(item);
         if (!node)
             continue;
 
@@ -100,18 +100,18 @@ void Buffer::calculateForces()
     }
 //! [3]
 
-////! [4]
-//    // Now subtract all forces pulling items together
-//    double weight = (edgeList.size() + 1) * 10;
-//    foreach (Edge *edge, edgeList) {
-//        QPointF vec;
-//        if (edge->sourceBuffer() == this)
-//            vec = mapToItem(edge->destBuffer(), 0, 0);
-//        else
-//            vec = mapToItem(edge->sourceBuffer(), 0, 0);
-//        xvel -= vec.x() / weight;
-//        yvel -= vec.y() / weight;
-//    }
+//! [4]
+    // Now subtract all forces pulling items together
+    double weight = (edgeList.size() + 1) * 10;
+    foreach (Edge *edge, edgeList) {
+        QPointF vec;
+        if (edge->sourceNode() == this)
+            vec = mapToItem(edge->destNode(), 0, 0);
+        else
+            vec = mapToItem(edge->sourceNode(), 0, 0);
+        xvel -= vec.x() / weight;
+        yvel -= vec.y() / weight;
+    }
 //! [4]
 
 //! [5]
@@ -128,7 +128,7 @@ void Buffer::calculateForces()
 //! [6]
 
 //! [7]
-bool Buffer::advance()
+bool Brain::advance()
 {
     if (newPos == pos())
         return false;
@@ -139,65 +139,45 @@ bool Buffer::advance()
 //! [7]
 
 //! [8]
-QRectF Buffer::boundingRect() const
+QRectF Brain::boundingRect() const
 {
-    const int cellW = 30;
     return QRectF( 0, 0,
-                  cellW, cellW*buffer_size> 600? 603: cellW*buffer_size + 3);
+                  128, 128);
 }
 //! [8]
 
 //! [9]
-QPainterPath Buffer::shape() const
+QPainterPath Brain::shape() const
 {
     QPainterPath path;
-    path.addRect(boundingRect());
-
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_MAEMO_5)
+    // Add some extra space around the circle for easier touching with finger
+    path.addEllipse( -40, -40, 80, 80);
+#else
+    path.addRect(0, 0, 128, 128);
+#endif
     return path;
 }
 //! [9]
 
-#include <QDebug>
-void Buffer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+#include <QPixmap>
+void Brain::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
 
-    const int cellW = 30;
-    QRadialGradient gradient(-3, -3, 10);
-    if (option->state & QStyle::State_Sunken) {
-        gradient.setColorAt(1, QColor(Qt::yellow).light(120));
-        gradient.setColorAt(0, QColor(Qt::darkYellow).light(120));
-    } else {
-        gradient.setColorAt(0, Qt::yellow);
-        gradient.setColorAt(1, Qt::darkYellow);
-    }
+    QLinearGradient gradient;
 
-    QRadialGradient red(-3, -3, 10);
-    if (option->state & QStyle::State_Sunken) {
-        red.setColorAt(1, QColor(Qt::red).light(120));
-        red.setColorAt(0, QColor(Qt::darkRed).light(120));
-    } else {
-        red.setColorAt(0, Qt::red);
-        red.setColorAt(1, Qt::darkRed);
-    }
+    gradient.setStart(0,-128);
+    gradient.setFinalStop(0,128);
+    gradient.setColorAt(1, QColor(Qt::darkBlue).light(120));
+    gradient.setColorAt(0, QColor(Qt::blue).light(120));
 
-    painter->setPen(QPen(Qt::black, 0));
-    qreal cellH = cellW*buffer_size> 600? (qreal)600/buffer_size: 30;
-    for(unsigned int i=0; i<buffer_size; i++){
-        //Рисуем в зависимости от различий
-        if(diff.size()<=i)
-            painter->setBrush(gradient);
-        else if(diff.at(i)!=0){
-            painter->setBrush(red);
-        }else{
-            painter->setBrush(gradient);
-        }
-        painter->drawRect(0, i*cellH, cellW, (i+1)*cellH);
-    }
+    painter->setBrush(gradient);
+//    painter->fillRect(boundingRect(), gradient);
+    painter->drawPixmap(boundingRect(), QPixmap(":/items/brain.png"), boundingRect());
 }
-//! [10]
 
 //! [11]
-QVariant Buffer::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant Brain::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case ItemPositionHasChanged:
@@ -214,13 +194,13 @@ QVariant Buffer::itemChange(GraphicsItemChange change, const QVariant &value)
 //! [11]
 
 //! [12]
-void Buffer::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void Brain::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mousePressEvent(event);
 }
 
-void Buffer::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void Brain::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mouseReleaseEvent(event);

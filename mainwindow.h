@@ -7,10 +7,11 @@
 #include <QTreeWidgetItem>
 #include <QList>
 
-#include "vanalysebuffer.h"
 #include "node.h"
 #include "buffer.h"
 #include "vibuffer.h"
+#include "brain.h"
+#include "analyse.h"
 
 namespace Ui {
 class MainWindow;
@@ -43,15 +44,21 @@ private slots:
 
     void on_action_addBuffer_triggered();
 
+    void on_action_addEdge_triggered();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene scene;
     void clearModeSelectin();
-    vAnalyseBuffer *buffer;
     QGraphicsProxyWidget *b;
-    QList <Node*> nodeList;
+    QList <Analyse*> nodeList;
     QList <Buffer*> bufferList;
     vIBuffer ibuffer;
+
+    /**
+     * @brief Элемент, с которого снимается вход нейронной сети
+     */
+    Brain* brain;
 
 
 
