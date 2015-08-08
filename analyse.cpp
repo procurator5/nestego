@@ -46,12 +46,17 @@
 #include "edge.h"
 #include "analyse.h"
 #include "buffer.h"
+#include "vanalyserform.h"
+
+#include "csignal.h"
+
+extern CSignal* signal;
 
 #include <QDebug>
 
 //! [0]
 Analyse::Analyse(QGraphicsView *graphWidget)
-    : Node(graphWidget), num_input(0), name("noname"), neural(NULL)
+    : Node(graphWidget), num_input(0), name("noname"), fann(NULL)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
@@ -171,7 +176,7 @@ QPainterPath Analyse::shape() const
 //! [9]
 
 //! [10]
-void Analyse::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void Analyse::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setPen(Qt::NoPen);
     painter->setBrush(Qt::darkGray);
@@ -223,6 +228,7 @@ QVariant Analyse::itemChange(GraphicsItemChange change, const QVariant &value)
 void Analyse::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
+    signal->analyseMouseClicked(this);
     QGraphicsItem::mousePressEvent(event);
 }
 
@@ -233,15 +239,34 @@ void Analyse::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 //! [12]
 
+void Analyse::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
+    vAnalyserForm * af = new vAnalyserForm();
+    af->setAnalyseName(name);
+    af->setLibFannParametrs(3, 3, FANN_GAUSSIAN_SYMMETRIC);
+    af->setDataSource(edgeList);
+    af->exec();
+
+    if(af->isAcceptButtonClicked()){
+
+    }
+    delete af;
+}
+
 bool Analyse::createNeuralNetwork(){
     return createLibFann();
 
 }
 
+vLibFannClass* Analyse::getLibFann(){
+    if(!createLibFann())
+        return NULL;
+    return fann;
+}
+
 bool Analyse::createLibFann(){
 
-    if(neural!=0){
-        fann_destroy(neural);
+    if(fann != NULL){
+        delete fann;
         num_input = 0;
         good = 0;
         bad = 0;
@@ -264,33 +289,16 @@ bool Analyse::createLibFann(){
     const unsigned int num_layers = 3;
     const unsigned int num_neurons_hidden = 3;
 
-    neural = fann_create_standard(num_layers, num_input,
-        num_neurons_hidden, num_output);
+    fann = new vLibFannClass(num_input);
 
-//Функция активации задается параметрами
-    fann_set_activation_function_hidden(neural, FANN_SIGMOID_SYMMETRIC);
-    fann_set_activation_function_output(neural, FANN_SIGMOID_SYMMETRIC);
-
-    //Заполняем веса случайными цифрами
-    fann_randomize_weights(neural, -0.1, 0.1);
     return true;
 }
 
-int Analyse::trainFann(QByteArray input, QByteArray diff){
+int Analyse::trainFann(vIBuffer * buffer){
 
-    //Готовим выборку для шага обучения
-
-    float *data =new float[num_input];
-    memset(data, 0, num_input*sizeof(float));
-    float desired_output = 0.0;
-
-    for(int i = 0; i<input.size(); i++){
-        data[i] = static_cast<float>(input.at(i));
-        desired_output += abs(static_cast<float>(diff.at(i)));
-    }
-    desired_output /=255;
-
-    fann_train(neural, data, &desired_output);
-
+    if(fann == NULL)
+        return -1;
+   fann->startTrainThread(buffer);
     return 0;
+
 }

@@ -5,7 +5,9 @@
 #-------------------------------------------------
 
 QT       += core gui
-LIBS += -lfann
+LIBS += -lfann \
+        -lqwt-qt4
+INCLUDEPATH += /usr/include/qwt-qt4
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,7 +18,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     vneuralanalyse.cpp \
-    vgraphicsproxywidget.cpp \
     vlineeditdelegate.cpp \
     vchoosedirectory.cpp \
     edge.cpp \
@@ -27,11 +28,13 @@ SOURCES += main.cpp\
     vanalyserform.cpp \
     brain.cpp \
     analyse.cpp \
-    vedgedialog.cpp
+    vedgedialog.cpp \
+    csignal.cpp \
+    vtrainthread.cpp \
+    vlibfannclass.cpp
 
 HEADERS  += mainwindow.h \
     vneuralanalyse.h \
-    vgraphicsproxywidget.h \
     vlineeditdelegate.h \
     vchoosedirectory.h \
     edge.h \
@@ -52,12 +55,14 @@ HEADERS  += mainwindow.h \
     fann_internal.h \
     fann_io.h \
     fann_train.h \
-    fixedfann.h
+    fixedfann.h \
+    csignal.h \
+    vtrainthread.h \
+    vlibfannclass.h
 
 FORMS    += mainwindow.ui \
     vneuralanalyse.ui \
     vchoosedirectory.ui \
-    vanalysebuffer.ui \
     vabufferform.ui \
     vanalyserform.ui \
     vedgedialog.ui

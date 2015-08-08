@@ -3,6 +3,9 @@
 #include <QTime>
 #include <QProcess>
 
+#include "csignal.h"
+extern CSignal* signal;
+
 vIBuffer::vIBuffer(QObject *parent) :
     QObject(parent)
 {
@@ -19,16 +22,20 @@ bool vIBuffer::setFile(){
 //Открываем пустой контейнер
     QDir dir(orig);
     QFileInfoList fl = dir.entryInfoList(QDir::Files);
-        if(fl.size() == 0 )
+        if(fl.size() == 0 ){
+            signal->logMessage(CRITICAL, QString::fromLocal8Bit("Директория с открытыми контейнерами пуста. Имя директории: %1").arg(orig));
             return false;
+        }
 
         QTime midnight(0,0,0);
         qsrand(midnight.secsTo(QTime::currentTime()));
         int pos = qrand() % fl.size();
 
         forig.setFileName(fl.at(pos).absoluteFilePath());
-        if(!forig.open(QIODevice::ReadOnly))
+        if(!forig.open(QIODevice::ReadOnly)){
+            signal->logMessage(CRITICAL, QString::fromLocal8Bit("Недоступен открытый контейнер. Имя контейнера: %1").arg(fl.at(pos).absoluteFilePath()));
             return false;
+        }
         //Открываем/создаем стегоконтейнер
         if(type == tExample){
             fstego.setFileName(stego + "/" +fl.at(pos).fileName());
@@ -39,8 +46,10 @@ bool vIBuffer::setFile(){
 
             }else if(stego.contains("%2")){
                 QString command = QString(stego).arg(fl.at(pos).absoluteFilePath()).arg(cashe_folder + "/" + fl.at(pos).fileName());
-                if(QProcess::execute(command)!=0)
+                if(QProcess::execute(command)!=0){
+                    signal->logMessage(CRITICAL, QString::fromLocal8Bit("Ошибка при выполнении команды: %1").arg(command));
                     return false;
+                }
 
             }else if(stego.contains("%1")){
                 QFile::copy(fl.at(pos).absoluteFilePath(), cashe_folder + "/" + fl.at(pos).fileName());
@@ -83,6 +92,7 @@ void vIBuffer::loadConfigurationFromWidget(QTreeWidget *infoWidget){
 }
 
 void vIBuffer::loadBuffer(){
+    seek = 0;
     if(!fstego.isOpen()){
         setFile();
     }
@@ -99,5 +109,12 @@ void vIBuffer::loadBuffer(){
 }
 
 QByteArray vIBuffer::getDiff(int size){
-    return diff.left(size);
+    if(seek+size > buffer_size)
+        loadBuffer();
+    seek += size;
+    return diff.mid(seek-size, size);
+}
+
+QByteArray vIBuffer::getBuffer(int size){
+    return stego_buff.mid(seek, size);
 }

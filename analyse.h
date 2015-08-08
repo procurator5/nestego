@@ -46,7 +46,9 @@
 #include <QGraphicsView>
 
 #include "node.h"
-#include "fann.h"
+#include "vlibfannclass.h"
+#include "vtrainthread.h"
+#include "vibuffer.h"
 
 class Edge;
 QT_BEGIN_NAMESPACE
@@ -65,10 +67,18 @@ public:
      */
     bool createNeuralNetwork();
 
-    int trainFann(QByteArray input, QByteArray diff);
+    int trainFann(vIBuffer* buffer);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
+
+    QList <train_result>& getTrainResult(){
+        if(fann == NULL){
+            QList <train_result> empty;
+            return empty;
+        }
+        return fann->getTrainResults();
+    };
 
 
     enum { Type = UserType + 1 };
@@ -79,21 +89,32 @@ public:
 
     void setName(QString nm){
         name = nm;
+        update();
     };
 
     QString getName(){
         return name;
     };
 
+    unsigned int getNumInput(){
+        return num_input;
+    };
+
     QRectF boundingRect() const;
     QPainterPath shape() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    /**
+     * @brief Передача элемента vLibFannClass для настройки
+     * @return vLibFannClass* или NULL
+     */
+    vLibFannClass* getLibFann();
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *);
     
 private:
     QList<Edge *> edgeList;
@@ -107,7 +128,7 @@ private:
      * @brief Нейронная сеть из библиотеки LIBFANN
      */
 
-    struct fann *neural;
+    vLibFannClass *fann;
     /**
      * @brief Количество байт на входе нейронной сети
      */

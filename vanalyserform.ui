@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>452</width>
-    <height>307</height>
+    <width>580</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,7 +28,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="text">
+        <string>Noname</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -41,7 +45,7 @@
       <attribute name="title">
        <string>Обучение</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -65,7 +69,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Обратное распространение ошибки</string>
+             <string>libFANN</string>
             </property>
            </item>
           </widget>
@@ -75,7 +79,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Дополнительные параметры</string>
+          <string>Общие параметры</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -125,6 +129,54 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Критерии обучения методом обратного распространения ошибки</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Обрабатывать файл</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_5">
+              <item>
+               <property name="text">
+                <string>Полностью</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>До достижения % ошибки</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>До достижения % ошибки</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -136,6 +188,272 @@
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_fann">
+      <attribute name="title">
+       <string>FANN</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QSpinBox" name="spinBox_2">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="verticalSlider">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGraphicsView" name="graphicsView"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QSlider" name="horizontalSlider">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_3">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Функция активации (внешняя)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_3">
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_THRESHOLD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_THRESHOLD_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_SYMMETRIC_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_ELLIOT</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_ELLIOT_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR_PIECE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR_PIECE_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIN_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_COS_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIN</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_COS</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Функци активации (внутренняя)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_4">
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_THRESHOLD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_THRESHOLD_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIGMOID_SYMMETRIC_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_GAUSSIAN_STEPWISE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_ELLIOT</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_ELLIOT_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR_PIECE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_LINEAR_PIECE_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIN_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_COS_SYMMETRIC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_SIN</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FANN_COS</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

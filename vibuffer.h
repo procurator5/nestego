@@ -20,6 +20,7 @@ public:
     ~vIBuffer();
 
      QByteArray getDiff(int size);
+     QByteArray getBuffer(int size);
 public slots:
      /**
       * @brief Загрузить следующую порцию данных
@@ -68,6 +69,7 @@ protected:
      */
 
     int buffer_size;
+    long int seek;
 
     QFile forig;
     QFile fstego;

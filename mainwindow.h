@@ -12,6 +12,10 @@
 #include "vibuffer.h"
 #include "brain.h"
 #include "analyse.h"
+#include "csignal.h"
+
+#include <qwt-qt4/qwt_plot.h>
+#include <qwt_plot_curve.h>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +29,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    /**
+     * @brief Запись информации о выполнении в лог (расположен в виджете ui->textBrowser)
+     * @param level Уровень логгирования, расположен в перечислении Level
+     * @param message Текст сообщения
+     */
+    void logInfo(int level, QString message);
+
 private slots:
     void on_action_addAnalyze_triggered();
 
@@ -35,7 +47,6 @@ private slots:
     void on_action_saveProject_triggered();
 
     void on_action_OpenProject_triggered();
-    void bufferResized ( const QRectF & rect );
 
     /**
      * @brief Запуск процесса обучения
@@ -45,6 +56,24 @@ private slots:
     void on_action_addBuffer_triggered();
 
     void on_action_addEdge_triggered();
+
+    /**
+     * @brief Показывает график обучения нейронной сети
+     * @param Analyse* идентификатор нейронной сети
+     */
+    void showTrainPlot(Analyse*);
+
+
+
+    void on_checkBox_clicked(bool checked);
+
+    void on_checkBox_2_clicked(bool checked);
+
+    void on_checkBox_5_clicked(bool checked);
+
+    void on_checkBox_6_clicked(bool checked);
+
+    void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -60,7 +89,10 @@ private:
      */
     Brain* brain;
 
-
+    QwtPlotCurve* need_result;
+    QwtPlotCurve* output_before_train;
+    QwtPlotCurve* error1;
+    QwtPlotCurve* error2;
 
 };
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>NeStego</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -36,7 +36,7 @@
              <x>0</x>
              <y>0</y>
              <width>408</width>
-             <height>386</height>
+             <height>355</height>
             </rect>
            </property>
            <attribute name="label">
@@ -61,7 +61,7 @@
                <number>3</number>
               </property>
               <attribute name="headerVisible">
-               <bool>true</bool>
+               <bool>false</bool>
               </attribute>
               <attribute name="headerCascadingSectionResizes">
                <bool>true</bool>
@@ -255,16 +255,158 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>96</height>
+             <width>408</width>
+             <height>355</height>
             </rect>
            </property>
            <attribute name="label">
             <string>Ход выполнения</string>
            </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QTextBrowser" name="textBrowser"/>
+             <widget class="QStackedWidget" name="stackedWidget">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="page">
+               <layout class="QGridLayout" name="gridLayout_7">
+                <item row="0" column="0">
+                 <widget class="QGroupBox" name="groupBox_4">
+                  <property name="title">
+                   <string>Отладка</string>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_2">
+                   <item row="0" column="0">
+                    <widget class="QTextBrowser" name="debugBrowser"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="page_3">
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QGroupBox" name="groupBox_3">
+                  <property name="title">
+                   <string>Общая информация</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_5">
+                   <item>
+                    <widget class="QTextBrowser" name="textBrowser"/>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                     <item>
+                      <spacer name="horizontalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_2">
+                       <property name="text">
+                        <string>Сохранить в csv</string>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="icons.qrc">
+                         <normaloff>:/options/document-save-all.png</normaloff>:/options/document-save-all.png</iconset>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>408</width>
+             <height>355</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Ход обучения (график)</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QwtPlot" name="qwtPlot" native="true"/>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox">
+              <property name="text">
+               <string>Фактическое значение</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_2">
+              <property name="text">
+               <string>Значение НС до обучения</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_3">
+              <property name="text">
+               <string>Значение НС после обучения</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_4">
+              <property name="text">
+               <string>Разница между фактическим значением  НС</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_5">
+              <property name="text">
+               <string>Ошибка 1-го рода</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_6">
+              <property name="text">
+               <string>Ошибка 2-го рода</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -340,6 +482,7 @@
    <addaction name="action_addBuffer"/>
    <addaction name="action_addAnalyze"/>
    <addaction name="action_addEdge"/>
+   <addaction name="action_feedbackBuffer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_addAnalyze">
@@ -387,8 +530,21 @@
     <string>Добавить связь</string>
    </property>
   </action>
+  <action name="action_feedbackBuffer">
+   <property name="text">
+    <string>Добавить обратный буфер</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">qwt-qt4/qwt_plot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>

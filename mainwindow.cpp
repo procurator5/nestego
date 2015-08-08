@@ -6,12 +6,15 @@
 #include <QFileDialog>
 #include <QDebug>
 
-#include "vgraphicsproxywidget.h"
 #include "vlineeditdelegate.h"
 #include "edge.h"
 #include "vabufferform.h"
 #include "vanalyserform.h"
 #include "vedgedialog.h"
+
+
+
+extern CSignal *signal;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -28,17 +31,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->graphicsView->setScene(&scene);
 
-    connect(&scene, SIGNAL(sceneRectChanged( const QRectF & )), this, SLOT(bufferResized( const QRectF & )));
+    connect(signal, SIGNAL(signalLogMessage(int, QString)), this, SLOT(logInfo(int, QString)));
+    connect(signal, SIGNAL(signalAnalyseMouseClicked(Analyse*)), this, SLOT(showTrainPlot(Analyse*)));
 
     brain = new Brain(ui->graphicsView);
     scene.addItem(brain);
     brain->setPos(0, 50);
 
-}
+    //Готовим элементы для рисования графиков
 
-void MainWindow::bufferResized ( const QRectF & rect ){
-//    buffer->setFixedHeight(rect.height());
-//    b->setPos( -rect.width() + buffer->width(), -rect.height()/2);
+    need_result = new QwtPlotCurve("Need Result");
+    QPen pen_need_result(Qt::green);
+    need_result->setPen(pen_need_result);
+
+
+    output_before_train = new QwtPlotCurve("Out before train");
+    QPen pen_higest(Qt::red);
+    output_before_train->setPen(pen_higest);
+
+    error1 = new QwtPlotCurve("Out before train");
+    QPen pen_error1(Qt::blue);
+    error1->setPen(pen_error1);
+
+    error2 = new QwtPlotCurve("Out before train");
+    QPen pen_error2(Qt::yellow);
+    error2->setPen(pen_error2);
 
 }
 
@@ -52,13 +69,14 @@ void MainWindow::on_action_addAnalyze_triggered()
     vAnalyserForm af;
     af.exec();
  //   scene.addItem(new vGraphicsProxyWidget);
-    Analyse *node = new Analyse(ui->graphicsView);
-    scene.addItem(node);
-    node->setPos(0, 0);
-    nodeList.append(node);
 
+    Analyse *node = af.getAnalyse(ui->graphicsView);
+    if(node!=NULL){
+        scene.addItem(node);
+        node->setPos(0, 0);
+        nodeList.append(node);
 
-
+    }
 }
 
 void MainWindow::on_treeWidget_doubleClicked(const QModelIndex &index)
@@ -135,7 +153,7 @@ void MainWindow::on_action_saveProject_triggered()
     }
     settings.endGroup();
 
-    //Сохраняем конфигурацию буферов
+    //Сохраняем конфигурацию анализаторов
     settings.beginGroup("nodes");
     for(QList<Analyse*>::iterator it = nodeList.begin(); it!=nodeList.end(); ++it){
         settings.beginGroup((*it)->getName());
@@ -282,9 +300,24 @@ void MainWindow::on_pushButton_clicked()
 {
     ibuffer.loadConfigurationFromWidget(ui->treeWidget);
     ibuffer.loadBuffer();
+
+//Инициализируюся нейронные сети-анализаторы
+    for(QList<Analyse*>::iterator it = nodeList.begin(); it!= nodeList.end(); ++it){
+        (*it)->createNeuralNetwork();
+    }
+
     for(QList<Buffer*>::iterator it = bufferList.begin(); it!= bufferList.end(); ++it){
-        (*it)->setDiff(ibuffer.getDiff((*it)->getBufferSize()));
+        int  size = (*it)->getBufferSize();
+        (*it)->setDiff(ibuffer.getDiff(size));
         (*it)->update();
+    //Определяем связи буфера и отправляем полученные данные на "Обучение"
+        QList<Edge*> edges = (*it)->edges();
+        for(QList<Edge*>::iterator et = edges.begin(); et != edges.end(); ++et){
+            Analyse *an = dynamic_cast<Analyse*> ((*et)->destNode());
+            if(an != NULL)
+                an->trainFann(&ibuffer);
+
+        }
     }
 //    buffer->loadBuffer();
 }
@@ -320,5 +353,121 @@ void MainWindow::on_action_addEdge_triggered()
 
     Edge *edge = ed.getEdge();
     scene.addItem(edge);
+
+}
+
+void MainWindow::logInfo(int lev, QString message){
+    Level level = (Level) lev;
+    ui->textBrowser->append(message);
+
+}
+
+void MainWindow::showTrainPlot(Analyse *an){
+
+//    ui->qwtPlot->clear();
+    ui->toolBox->setCurrentIndex(2);
+    //Рисуем график
+
+    int i = 0;
+    QList<train_result> list = an->getTrainResult();
+    if(list.empty())
+        return;
+
+
+    QVector <double> output_before_train_vector(list.size());
+    QVector <double> need_result_vector(list.size());
+    QVector <double> error1_vector(list.size());
+    QVector <double> error2_vector(list.size());
+    QVector <double> x(list.size());
+
+    double error1_sum=0;
+    double error2_sum=0;
+
+    for(QList<train_result>::iterator it = list.begin(); it!= list.end();++it){
+        output_before_train_vector[i] = (*it).output_before_train;
+        need_result_vector[i] = (*it).need_result;
+        error1_sum += (*it).error1;
+        error1_vector[i] = error1_sum/(i+1);
+
+        error2_sum += (*it).error2;
+        error2_vector[i] = error2_sum/(i+1);
+
+        x[i] = i;
+        i++;
+    }
+    output_before_train->setData(x, output_before_train_vector);
+    need_result->setData(x, need_result_vector);
+    error1->setData(x, error1_vector);
+    error2->setData(x, error2_vector);
+
+    output_before_train->attach(ui->qwtPlot);
+    need_result->attach(ui->qwtPlot);
+    error1->attach(ui->qwtPlot);
+    error2->attach(ui->qwtPlot);
+    ui->qwtPlot->replot();
+}
+
+void MainWindow::on_checkBox_clicked(bool checked)
+{
+    if(checked)
+        need_result->setVisible(true);
+    else
+        need_result->setVisible(false);
+
+    ui->qwtPlot->replot();
+}
+
+void MainWindow::on_checkBox_2_clicked(bool checked)
+{
+    if(checked)
+        output_before_train->setVisible(true);
+    else
+        output_before_train->setVisible(false);
+
+    ui->qwtPlot->replot();
+
+}
+
+void MainWindow::on_checkBox_5_clicked(bool checked)
+{
+    if(checked)
+        error1->setVisible(true);
+    else
+        error1->setVisible(false);
+
+    ui->qwtPlot->replot();
+}
+
+void MainWindow::on_checkBox_6_clicked(bool checked)
+{
+    if(checked)
+        error2->setVisible(true);
+    else
+        error2->setVisible(false);
+
+    ui->qwtPlot->replot();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                               QCoreApplication::applicationDirPath(),
+                               tr("Nestego project (*.csv )"));
+
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    QTextStream stream( &file );
+    QStringList text = ui->textBrowser->toPlainText().split("\n");
+    int i=0;
+    for(QStringList::iterator it = text.begin(); it!= text.end(); ++it){
+        QString line  = *it;
+        if(line.indexOf("Step")!= -1){
+            stream<<"\r\n"<<++i<<",";
+        }else{
+            stream<<line.mid(line.indexOf(QRegExp("[0123456789]"))).toDouble()<<",";
+        }
+
+    }
 
 }
