@@ -6,10 +6,10 @@
 
 QT       += core gui
 LIBS += -lfann \
-        -lqwt-qt4
-INCLUDEPATH += /usr/include/qwt-qt4
+        -lqwt
+INCLUDEPATH += /usr/include/qwt
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += widgets
 
 TARGET = nestego
 TEMPLATE = app
@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     vedgedialog.cpp \
     csignal.cpp \
     vtrainthread.cpp \
-    vlibfannclass.cpp
+    vlibfannclass.cpp \
+    feedbackbuffer.cpp \
+    vbufferviewform.cpp
 
 HEADERS  += mainwindow.h \
     vneuralanalyse.h \
@@ -58,14 +60,17 @@ HEADERS  += mainwindow.h \
     fixedfann.h \
     csignal.h \
     vtrainthread.h \
-    vlibfannclass.h
+    vlibfannclass.h \
+    feedbackbuffer.h \
+    vbufferviewform.h
 
 FORMS    += mainwindow.ui \
     vneuralanalyse.ui \
     vchoosedirectory.ui \
     vabufferform.ui \
     vanalyserform.ui \
-    vedgedialog.ui
+    vedgedialog.ui \
+    vbufferviewform.ui
 
 RESOURCES += \
     icons.qrc

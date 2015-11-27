@@ -242,11 +242,33 @@ void Analyse::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void Analyse::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     vAnalyserForm * af = new vAnalyserForm();
     af->setAnalyseName(name);
-    af->setLibFannParametrs(3, 3, FANN_GAUSSIAN_SYMMETRIC);
+    if(fann != NULL){
+        af->setLibFannParametrs(fann->getNumLayers(), 3, fann->getActivationFunction());
+        //Устанавливаем выходные значения
+        train_result lastStep =fann->lastStep();
+
+        af->setOutput((int)(lastStep.output_before_train*255),
+                      (int)(lastStep.output_after_train*255),
+                      (int)(lastStep.need_result*255));
+
+    }else{
+        createNeuralNetwork();
+        af->setLibFannParametrs(3, 3, FANN_SIGMOID_SYMMETRIC);
+    }
+
     af->setDataSource(edgeList);
     af->exec();
 
-    if(af->isAcceptButtonClicked()){
+    //Устанавливаем новые значения НС
+    if(af->isAcceptButtonClicked()){            
+        name = af->analyseName();
+
+        if(fann != NULL){
+            fann->setNumLayers(af->numLayers());
+            fann->setActivationFunction(af->outputActivationFunction());
+
+        }
+        update();
 
     }
     delete af;
@@ -282,12 +304,12 @@ bool Analyse::createLibFann(){
     if(num_input ==0)
         return false;
 
-    const unsigned int num_output = 1;
+//    const unsigned int num_output = 1;
 
-//Настройки нейронной стети, которые задаются соответствующими параметрами
+//Настройки нейронной сети, которые задаются соответствующими параметрами
 //Из пользовательской формы
-    const unsigned int num_layers = 3;
-    const unsigned int num_neurons_hidden = 3;
+//    const unsigned int num_layers = 3;
+//    const unsigned int num_neurons_hidden = 3;
 
     fann = new vLibFannClass(num_input);
 
@@ -300,5 +322,42 @@ int Analyse::trainFann(vIBuffer * buffer){
         return -1;
    fann->startTrainThread(buffer);
     return 0;
+
+}
+
+int Analyse::getResult(QByteArray buffer){
+    return fann->calculate(buffer);
+}
+
+int Analyse::train(QByteArray buffer, int result){
+    return fann->trainFannOneStep(buffer, result);
+}
+
+void Analyse::setTrainResult(int output_before_train, int output_after_train, int need_result){
+    train_result result;
+    result.output_before_train = (float)output_before_train/255;
+    result.output_after_train = (float) output_after_train/255;
+    result.need_result = (float) need_result/255;
+    result.error1 = (need_result == 0 && output_before_train != 0) ?  true : false;
+    result.error2 = (need_result != 0 && output_before_train == 0) ?  1 : 0;
+    setStructTrainResult(result);
+}
+
+void Analyse::setStructTrainResult(train_result step){
+    fann->setTrainResult(step);
+}
+
+bool Analyse::saveAnalyse(QString filename){
+    if(fann!=NULL)
+        return fann->saveFann(filename);
+    return false;
+}
+
+bool Analyse::loadAnalyseFromFile(QString filename){
+    if(fann == NULL)
+        createNeuralNetwork();
+    if(fann != NULL)
+        return fann->loadFannFromFile(filename);
+    return false;
 
 }

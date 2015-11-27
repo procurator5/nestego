@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(signal, SIGNAL(signalLogMessage(int, QString)), this, SLOT(logInfo(int, QString)));
     connect(signal, SIGNAL(signalAnalyseMouseClicked(Analyse*)), this, SLOT(showTrainPlot(Analyse*)));
+    connect(signal, SIGNAL(signalBufferMouseClicked(Buffer*)), this, SLOT(showBufferData(Buffer*)));
 
     brain = new Brain(ui->graphicsView);
     scene.addItem(brain);
@@ -106,6 +107,10 @@ void MainWindow::on_action_saveProject_triggered()
                                tr("Nestego project (*.nes )"));
     if(fileName.isEmpty())
         return;
+
+    QFileInfo fi(fileName);
+    QString path = fi.absolutePath();
+
     QSettings settings(fileName, QSettings::IniFormat);
     settings.clear();
     settings.beginGroup("source");
@@ -159,15 +164,36 @@ void MainWindow::on_action_saveProject_triggered()
         settings.beginGroup((*it)->getName());
         settings.setValue("x", (*it)->pos().x());
         settings.setValue("y", (*it)->pos().y());
+
+        QList <train_result> train = (*it)->getTrainResult();
+        QList <QVariant> teach;
+    //Преобразуем выборку в сохраняемый формат QSettings
+        for(QList <train_result>::iterator it = train.begin(); it!= train.end(); ++it){
+            QList <QVariant> oneStep;
+            oneStep<<QVariant((*it).output_before_train);
+            oneStep<<QVariant((*it).output_after_train);
+            oneStep<<QVariant((*it).need_result);
+            oneStep<<QVariant((*it).error1);
+            oneStep<<QVariant((*it).error2);
+            teach.append(oneStep);
+        }
+
+        settings.setValue("teach", QVariant(teach));
+
         QList <Edge*> edges = (*it)->edges();
         for(QList<Edge*>::iterator et = edges.begin(); et!=edges.end(); ++et){
+            //Сохраняем связи между анализаторами
             Analyse* an = dynamic_cast <Analyse*> ((*et)->destNode());
-            if(an!=NULL)
+            if(an!=NULL){
                 settings.setValue("edge", an->getName());
+            }
             Brain* br = dynamic_cast <Brain*> ((*et)->destNode());
             if(br != NULL)
                 settings.setValue("edge", "brain");
+
         }
+        //Сохраняем веса анализаторов
+        (*it)->saveAnalyse(path + "/" + (*it)->getName()+".fan");
         settings.endGroup();
 
     }
@@ -189,6 +215,10 @@ void MainWindow::on_action_OpenProject_triggered()
                             tr("Nestego project (*.nes )"));
     if(fileName.isEmpty())
         return;
+
+    QFileInfo fi(fileName);
+    QString path = fi.absolutePath();
+
     clearModeSelectin();
     QSettings settings(fileName, QSettings::IniFormat);
     settings.beginGroup("source");
@@ -267,6 +297,7 @@ void MainWindow::on_action_OpenProject_triggered()
     settings.endGroup();
 
     //Загружаем связи между элементами
+    //Для буфферов
     settings.beginGroup("buffers");
     chgr = settings.childGroups();
     int i = 0;
@@ -282,6 +313,39 @@ void MainWindow::on_action_OpenProject_triggered()
     }
     settings.endGroup();
 
+    //Для анализаторов
+
+    settings.beginGroup("nodes");
+    chgr = settings.childGroups();
+    for(QStringList::iterator it = chgr.begin(); it!=chgr.end();++it){
+        settings.beginGroup(*it);
+        QString name = settings.value("edge").toString();
+        if(name == "brain"){
+            //Устанавливаем выход на итоговый анализатор
+            scene.addItem(new Edge(getAnalyseByName(*it), brain));
+        }else
+            scene.addItem(new Edge(getAnalyseByName(*it), getAnalyseByName(name)));
+
+        //Читаем параметры НС
+        if (!getAnalyseByName(*it)->loadAnalyseFromFile(path+"/"+(*it)+".fan")){
+            signal->logMessage((Level)3, "!!Error load settings analyse "+*it+" from file "+path+"/"+*it+".fan");
+            getAnalyseByName(*it)->createNeuralNetwork();
+        }
+        //Добавляем результаты обучения
+        QList <QVariant> teach = settings.value("teach").toList();
+        for(int i =0; i<teach.size(); i+=5){
+            QVector <int> oneStep(5);
+            for(int j=0; j<5; j++){
+                float value = teach.at(i+j).toFloat()*255;
+                oneStep[j] = value;
+            }
+
+            getAnalyseByName(*it)->setTrainResult(oneStep.at(0), oneStep.at(1), oneStep.at(2));
+            oneStep.clear();
+        }
+        settings.endGroup();
+    }
+    settings.endGroup();
 }
 
 
@@ -300,7 +364,7 @@ void MainWindow::on_pushButton_clicked()
 {
     ibuffer.loadConfigurationFromWidget(ui->treeWidget);
     ibuffer.loadBuffer();
-
+/*
 //Инициализируюся нейронные сети-анализаторы
     for(QList<Analyse*>::iterator it = nodeList.begin(); it!= nodeList.end(); ++it){
         (*it)->createNeuralNetwork();
@@ -320,6 +384,10 @@ void MainWindow::on_pushButton_clicked()
         }
     }
 //    buffer->loadBuffer();
+*/
+    //Делаем N одиночных шагов
+    for(int i =0; i<ui->spinBox->value();i++)
+        this->on_action_Debug_triggered();
 }
 
 void MainWindow::on_action_addBuffer_triggered()
@@ -395,10 +463,16 @@ void MainWindow::showTrainPlot(Analyse *an){
         x[i] = i;
         i++;
     }
+    /*
     output_before_train->setData(x, output_before_train_vector);
     need_result->setData(x, need_result_vector);
     error1->setData(x, error1_vector);
     error2->setData(x, error2_vector);
+*/
+    output_before_train->setSamples(x, output_before_train_vector);
+    need_result->setSamples(x, need_result_vector);
+    error1->setSamples(x, error1_vector);
+    error2->setSamples(x, error2_vector);
 
     output_before_train->attach(ui->qwtPlot);
     need_result->attach(ui->qwtPlot);
@@ -469,5 +543,74 @@ void MainWindow::on_pushButton_2_clicked()
         }
 
     }
+
+}
+
+void MainWindow::on_action_feedBackBuffer_triggered()
+{
+    vABufferForm bf(this);
+    bf.exec();
+
+    FeedBackBuffer *buffer = bf.returnFeedBackBuffer(ui->graphicsView);
+}
+
+void MainWindow::on_action_Debug_triggered()
+{
+
+    QTreeWidgetItem * item = ui->treeWidget->topLevelItem(2);
+    int step = item->child(1)->text(1).toInt();
+
+    //Инициализируем данные для обработки
+    ibuffer.loadConfigurationFromWidget(ui->treeWidget);
+    ibuffer.loadBuffer();
+
+    //1. Загружаем данные в первичные буферы
+    for(QList<Buffer*>::iterator it = bufferList.begin(); it!= bufferList.end(); ++it){
+        int  size = (*it)->getBufferSize();
+        (*it)->loadData(ibuffer.getStegoBuffer(size), ibuffer.getOriginBuffer(size));
+        (*it)->update();
+    }
+    //2. Определяем, какие анализаторы работают напрямую с буферами обмена
+    //Определяем связи буфера и отправляем полученные данные на "Обучение"
+
+    for(QList<Buffer*>::iterator it = bufferList.begin(); it!= bufferList.end(); ++it){
+        QList<Edge*> edges = (*it)->edges();
+        QByteArray buf = (*it)->buffer();
+        //Вычисляем ожидаемый выход НС
+        int need_result = (*it)->getDiff();
+        for(QList<Edge*>::iterator et = edges.begin(); et != edges.end(); ++et){
+            Analyse *an = dynamic_cast<Analyse*> ((*et)->destNode());
+            if(an != NULL){
+                //Вычисляем выходы соответствующих анализаторов
+                int before = an->getResult(buf);
+
+                //Обучаем НС
+                an->train(buf, need_result);
+
+                //ПОлучаем результат НС после обучения
+                int after = an->getResult(buf);
+                an->setTrainResult(before, after, need_result);
+
+            }
+        }
+    }
+
+    ibuffer.moveBuffer(step);
+}
+
+Analyse* MainWindow::getAnalyseByName(QString name){
+    for(QList <Analyse*>::iterator it = nodeList.begin(); it != nodeList.end(); ++it)
+        if((*it)->getName() == name)
+            return *it;
+    return NULL;
+}
+
+#include "vbufferviewform.h"
+
+void MainWindow::showBufferData(Buffer *buf){
+    bool showForm = buf->haveForm();
+    vBufferViewForm *bvf = buf->getBufferForm();
+    if(!showForm)
+        QGraphicsProxyWidget *proxy = scene.addWidget(bvf, Qt::Window);
 
 }

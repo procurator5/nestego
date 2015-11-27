@@ -19,10 +19,21 @@ class vAnalyserForm : public QDialog
 public:
     explicit vAnalyserForm(QWidget *parent = 0);
     ~vAnalyserForm();
+    /**
+     * @brief Установать имя анализатора
+     * @param QString name имя
+     */
     void setAnalyseName(QString name);
+
+    QString analyseName();
+
     bool isAcceptButtonClicked(){
         return AcceptButtonClicked;
     };
+
+    int numLayers();
+    fann_activationfunc_enum outputActivationFunction();
+
 
     /**
      * @brief ВОзвращает объект Analyse, который потом помещается в рабочую область
@@ -33,6 +44,7 @@ public:
     void setLibFannParametrs(int layers, int hidden_neurons,
                              fann_activationfunc_enum func);
     void setDataSource(QList<Edge *> edgeList);
+    void setOutput(int before, int after, int need);
 
 private slots:
     void on_comboBox_currentIndexChanged(const QString &arg1);

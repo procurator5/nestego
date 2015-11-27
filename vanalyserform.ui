@@ -463,15 +463,10 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
-        <widget class="QTableWidget" name="tableWidget">
+        <widget class="QTreeWidget" name="treeWidget">
          <column>
           <property name="text">
-           <string>Источник</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Значимость</string>
+           <string>Данные</string>
           </property>
          </column>
         </widget>
@@ -484,12 +479,27 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="QTableWidget" name="tableWidget_2">
+        <widget class="QTreeWidget" name="treeWidget_2">
          <column>
           <property name="text">
-           <string>Получатель</string>
+           <string>Наименование</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Данные</string>
+          </property>
+         </column>
+         <item>
+          <property name="text">
+           <string>Результаты</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Получатели данных</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

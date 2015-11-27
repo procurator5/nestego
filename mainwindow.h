@@ -12,10 +12,12 @@
 #include "vibuffer.h"
 #include "brain.h"
 #include "analyse.h"
+#include "feedbackbuffer.h"
+
 #include "csignal.h"
 
-#include <qwt-qt4/qwt_plot.h>
-#include <qwt_plot_curve.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
 
 namespace Ui {
 class MainWindow;
@@ -63,6 +65,10 @@ private slots:
      */
     void showTrainPlot(Analyse*);
 
+    /**
+     * @brief Показывает содержимое начальных буферов
+     */
+    void showBufferData(Buffer*buf);
 
 
     void on_checkBox_clicked(bool checked);
@@ -75,11 +81,23 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_action_feedBackBuffer_triggered();
+
+
+    /**
+     * @brief Слот пошагового анализа файла (режим отладки)
+     */
+
+    void on_action_Debug_triggered();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene scene;
     void clearModeSelectin();
     QGraphicsProxyWidget *b;
+    /**
+     * @brief Список анализаторов, участвующих в работе стегодетектора
+     */
     QList <Analyse*> nodeList;
     QList <Buffer*> bufferList;
     vIBuffer ibuffer;
@@ -93,6 +111,8 @@ private:
     QwtPlotCurve* output_before_train;
     QwtPlotCurve* error1;
     QwtPlotCurve* error2;
+
+    Analyse *getAnalyseByName(QString name);
 
 };
 

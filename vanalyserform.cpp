@@ -15,6 +15,7 @@ vAnalyserForm::vAnalyserForm(QWidget *parent) :
     ui->label_8->hide();
 
     AcceptButtonClicked = false;
+    ui->treeWidget_2->setColumnWidth(0, 350);
 }
 
 vAnalyserForm::~vAnalyserForm()
@@ -85,6 +86,10 @@ void vAnalyserForm::setAnalyseName(QString name){
     ui->lineEdit->setText(name);
 }
 
+QString vAnalyserForm::analyseName(){
+    return ui->lineEdit->text();
+}
+
 void vAnalyserForm::setLibFannParametrs(int layers, int hidden_neurons,
                          fann_activationfunc_enum func){
     ui->comboBox->setCurrentIndex(2);
@@ -102,15 +107,24 @@ void vAnalyserForm::setDataSource(QList<Edge *> edgeList){
     for(QList<Edge*>::iterator it = edgeList.begin(); it != edgeList.end(); ++it){
         Buffer* buffer = dynamic_cast <Buffer*> ((*it)->sourceNode());
         if(buffer != NULL){
-            ui->tableWidget->setRowCount(ui->tableWidget->rowCount()+1);
-            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 0,
-                                     new QTableWidgetItem("Buffer"));
-            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 1,
-                                     new QTableWidgetItem(QString("%1").arg(buffer->getBufferSize())));
+            QStringList top;
+            top.append(QString("buffer(%1)").arg(buffer->getBufferSize()));
+            QTreeWidgetItem* b = new QTreeWidgetItem(top);
+            ui->treeWidget->addTopLevelItem(b);
+            QByteArray buf = buffer->buffer();
+            for(QByteArray::iterator it = buf.begin(); it!= buf.end(); ++it){
+                QStringList data;
+                data.append(QString("%1(%2)").arg((char)(*it)).arg((int)*it));
+                QTreeWidgetItem* element = new QTreeWidgetItem(b,
+                                                               data);
+                b->addChild(element);
+            }
+
             input_size+=buffer->getBufferSize();
         }
 
     }
+    ui->treeWidget->expandAll();
 }
 
 void vAnalyserForm::on_comboBox_5_activated(int index)
@@ -127,4 +141,45 @@ void vAnalyserForm::on_comboBox_5_currentIndexChanged(int index)
         ui->doubleSpinBox->show();
         ui->label_8->show();
     }
+}
+
+int vAnalyserForm::numLayers(){
+    return ui->spinBox_3->value();
+}
+
+fann_activationfunc_enum vAnalyserForm::outputActivationFunction(){
+    return (fann_activationfunc_enum) ui->comboBox_3->currentIndex();
+}
+
+void vAnalyserForm::setOutput(int before, int after, int need){
+    QTreeWidgetItem *top = ui->treeWidget_2->topLevelItem(0);
+    QStringList beforeData;
+    beforeData<<QString::fromLocal8Bit("Значение НС до обучения")<<QString("%1").arg(before);
+    QTreeWidgetItem* beforeItem = new QTreeWidgetItem(top, beforeData);
+    top->addChild(beforeItem);
+    QStringList afterData;
+    afterData<<QString::fromLocal8Bit("Значение НС после обучения")<<QString("%1").arg(after);
+    QTreeWidgetItem* afterItem = new QTreeWidgetItem(top, afterData);
+    top->addChild(afterItem);
+    QStringList needData;
+    needData<<QString::fromLocal8Bit("Ожидаемое значение НС")<<QString("%1").arg(need);
+    QTreeWidgetItem* needItem = new QTreeWidgetItem(top, needData);
+    top->addChild(needItem);
+
+    QString error1 = (need == 0 && before != 0) ?  QString::fromLocal8Bit("ДА") : QString::fromLocal8Bit("НЕТ");
+    QString error2 = (need != 0 && before == 0) ? QString::fromLocal8Bit("ДА") : QString::fromLocal8Bit("НЕТ");
+
+    QStringList error1Data;
+    error1Data<<QString::fromLocal8Bit("Ложное срабатывание")<<error1;
+    QTreeWidgetItem* error1Item = new QTreeWidgetItem(top, error1Data);
+    top->addChild(error1Item);
+
+    QStringList error2Data;
+    error2Data<<QString::fromLocal8Bit("Пропуск блока")<<error2;
+    QTreeWidgetItem* error2Item = new QTreeWidgetItem(top, error2Data);
+    top->addChild(error2Item);
+
+    ui->treeWidget_2->expandAll();
+    ui->treeWidget_2->adjustSize();
+
 }

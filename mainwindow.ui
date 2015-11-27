@@ -27,7 +27,13 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QToolBox" name="toolBox">
+          <property name="lineWidth">
+           <number>0</number>
+          </property>
           <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="tabSpacing">
            <number>0</number>
           </property>
           <widget class="QWidget" name="widget">
@@ -36,7 +42,7 @@
              <x>0</x>
              <y>0</y>
              <width>408</width>
-             <height>355</height>
+             <height>371</height>
             </rect>
            </property>
            <attribute name="label">
@@ -256,7 +262,7 @@
              <x>0</x>
              <y>0</y>
              <width>408</width>
-             <height>355</height>
+             <height>371</height>
             </rect>
            </property>
            <attribute name="label">
@@ -265,6 +271,12 @@
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <widget class="QStackedWidget" name="stackedWidget">
+              <property name="lineWidth">
+               <number>0</number>
+              </property>
+              <property name="midLineWidth">
+               <number>0</number>
+              </property>
               <property name="currentIndex">
                <number>1</number>
               </property>
@@ -292,6 +304,15 @@
                    <string>Общая информация</string>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_5">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <widget class="QTextBrowser" name="textBrowser"/>
                    </item>
@@ -338,7 +359,7 @@
              <x>0</x>
              <y>0</y>
              <width>408</width>
-             <height>355</height>
+             <height>371</height>
             </rect>
            </property>
            <attribute name="label">
@@ -413,11 +434,25 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Старт &gt;&gt;</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Старт &gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBox">
+            <property name="maximum">
+             <number>1000000000</number>
+            </property>
+            <property name="value">
+             <number>1000</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -465,9 +500,18 @@
     <addaction name="action_addBuffer"/>
     <addaction name="action_addAnalyze"/>
     <addaction name="action_addEdge"/>
+    <addaction name="action_feedBackBuffer"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Запуск</string>
+    </property>
+    <addaction name="action"/>
+    <addaction name="action_Debug"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -482,7 +526,9 @@
    <addaction name="action_addBuffer"/>
    <addaction name="action_addAnalyze"/>
    <addaction name="action_addEdge"/>
-   <addaction name="action_feedbackBuffer"/>
+   <addaction name="action_feedBackBuffer"/>
+   <addaction name="separator"/>
+   <addaction name="action_Debug"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_addAnalyze">
@@ -530,9 +576,27 @@
     <string>Добавить связь</string>
    </property>
   </action>
-  <action name="action_feedbackBuffer">
+  <action name="action_feedBackBuffer">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/options/edit-text-frame-update.png</normaloff>:/options/edit-text-frame-update.png</iconset>
+   </property>
    <property name="text">
     <string>Добавить обратный буфер</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Обучение</string>
+   </property>
+  </action>
+  <action name="action_Debug">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/options/debug-step-over.png</normaloff>:/options/debug-step-over.png</iconset>
+   </property>
+   <property name="text">
+    <string>Детекция (Debug)</string>
    </property>
   </action>
  </widget>
@@ -541,7 +605,7 @@
   <customwidget>
    <class>QwtPlot</class>
    <extends>QWidget</extends>
-   <header location="global">qwt-qt4/qwt_plot.h</header>
+   <header location="global">qwt_plot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

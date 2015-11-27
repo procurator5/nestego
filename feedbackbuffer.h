@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef FEEDBACKBUFFER_H
+#define FEEDBACKBUFFER_H
 
 #include <QGraphicsItem>
 #include <QList>
@@ -47,7 +47,6 @@
 #include <QByteArray>
 
 #include "node.h"
-#include "vbufferviewform.h"
 
 class Edge;
 QT_BEGIN_NAMESPACE
@@ -55,10 +54,10 @@ class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
 //! [0]
-class Buffer : public Node
+class FeedBackBuffer : public Node
 {
 public:
-    Buffer(QGraphicsView *graphWidget);
+    FeedBackBuffer(QGraphicsView *graphWidget);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -77,24 +76,6 @@ public:
         return buffer_size;
     };
 
-    QByteArray buffer(){
-        return work;
-    };
-
-    /**
-     * @brief Разница меджу буферами со стего и без
-     * @return
-     */
-    int getDiff();
-
-    /**
-     * @brief Возвращает виджет со свойствами буфера
-     * @return
-     */
-    vBufferViewForm* getBufferForm();
-
-    bool haveForm();
-
     void setDiff(QByteArray arr){
         diff.clear();
         diff.push_back(arr);
@@ -108,9 +89,6 @@ public:
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-public slots:
-    void loadData(QByteArray stego, QByteArray orig = QByteArray());
-
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
@@ -122,24 +100,7 @@ private:
     QPointF newPos;
     QGraphicsView *graph;
     unsigned int buffer_size;
-
-    /**
-     * @brief Массив предназначенный для анализа
-     */
-    QByteArray work;
-    /**
-     * @brief Массив для хранения данных до применения к ним стего преобразования
-     */
-    QByteArray origin;
-
-    /**
-     * @brief Разница между массивами work и origin
-     * (work - origin)
-     */
     QByteArray diff;
-
-    vBufferViewForm* bform;
-
 };
 //! [0]
 

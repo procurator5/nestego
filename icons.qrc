@@ -8,6 +8,8 @@
         <file>document-open.png</file>
         <file>document-save-all.png</file>
         <file>draw-bezier-curves.png</file>
+        <file>debug-step-over.png</file>
+        <file>edit-text-frame-update.png</file>
     </qresource>
     <qresource prefix="/items">
         <file>brain.png</file>

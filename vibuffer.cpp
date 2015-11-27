@@ -9,6 +9,7 @@ extern CSignal* signal;
 vIBuffer::vIBuffer(QObject *parent) :
     QObject(parent)
 {
+    seek =0x8FFFFFFFFFFFFF;
 }
 
 vIBuffer::~vIBuffer()
@@ -91,12 +92,17 @@ void vIBuffer::loadConfigurationFromWidget(QTreeWidget *infoWidget){
 
 }
 
+#include <QDebug>
+
 void vIBuffer::loadBuffer(){
-    seek = 0;
+    if(seek<buffer_size)
+        return;
+
     if(!fstego.isOpen()){
         setFile();
+        seek = 0;
     }
-    QByteArray orig_buff = forig.read(buffer_size);
+    origin = forig.read(buffer_size);
     stego_buff = fstego.read(buffer_size);
 
     if(stego_buff.size()<buffer_size)
@@ -104,8 +110,7 @@ void vIBuffer::loadBuffer(){
 
 
     for(int i=0; i<buffer_size; i++)
-        diff[i]=orig_buff[i]-stego_buff[i];
-
+        diff[i]=origin[i]-stego_buff[i];
 }
 
 QByteArray vIBuffer::getDiff(int size){
@@ -116,5 +121,33 @@ QByteArray vIBuffer::getDiff(int size){
 }
 
 QByteArray vIBuffer::getBuffer(int size){
+
+    isBuf(size);
     return stego_buff.mid(seek, size);
+}
+
+QByteArray vIBuffer::getStegoBuffer(int size){
+    isBuf(size);
+    return stego_buff.mid(seek, size);
+}
+
+QByteArray vIBuffer::getOriginBuffer(int size){
+    if(origin.size()<seek+size)
+        return QByteArray();
+    return origin.mid(seek, size);
+}
+
+void vIBuffer::moveBuffer(int size){
+    seek+=size;
+}
+
+void vIBuffer::isBuf(int size){
+    if(stego_buff.size()<seek+size){
+        seek+=size;
+        if(!forig.seek(forig.pos()-size))
+            signal->logMessage(ERROR, "QFile(orig)::seek: IODevice is not open");
+        if (!fstego.seek(fstego.pos()-size))
+            signal->logMessage(ERROR, "QFile(stego)::seek: IODevice is not open");            ;
+        loadBuffer();
+    }
 }

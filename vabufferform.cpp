@@ -24,3 +24,13 @@ Buffer* vABufferForm::returnElement(QGraphicsView *view){
     buf->setPos(-50, -50);
     return buf;
 }
+
+FeedBackBuffer* vABufferForm::returnFeedBackBuffer(QGraphicsView *view){
+
+    FeedBackBuffer* buf = new FeedBackBuffer(view);
+    buf->setBufferSize(ui->spinBox->value());
+    QGraphicsScene *scene = view->scene();
+    scene->addItem(buf);
+    buf->setPos(-50, -50);
+    return buf;
+}

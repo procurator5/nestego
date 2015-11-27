@@ -44,13 +44,10 @@
 #include <QStyleOption>
 
 #include "edge.h"
-#include "buffer.h"
-#include "csignal.h"
-
-extern CSignal *signal;
+#include "feedbackbuffer.h"
 
 //! [0]
-Buffer::Buffer(QGraphicsView *graphWidget)
+FeedBackBuffer::FeedBackBuffer(QGraphicsView *graphWidget)
     : Node(graphWidget)
 {
     setFlag(ItemIsMovable);
@@ -58,25 +55,24 @@ Buffer::Buffer(QGraphicsView *graphWidget)
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
     buffer_size = 2;
-    bform = NULL;
 }
 //! [0]
 
 //! [1]
-void Buffer::addEdge(Edge *edge)
+void FeedBackBuffer::addEdge(Edge *edge)
 {
     edgeList << edge;
     edge->adjust();
 }
 
-QList<Edge *> Buffer::edges() const
+QList<Edge *> FeedBackBuffer::edges() const
 {
     return edgeList;
 }
 //! [1]
 
 //! [2]
-void Buffer::calculateForces()
+void FeedBackBuffer::calculateForces()
 {
     if (!scene() || scene()->mouseGrabberItem() == this) {
         newPos = pos();
@@ -89,7 +85,7 @@ void Buffer::calculateForces()
     qreal xvel = 0;
     qreal yvel = 0;
     foreach (QGraphicsItem *item, scene()->items()) {
-        Buffer *node = qgraphicsitem_cast<Buffer *>(item);
+        FeedBackBuffer *node = qgraphicsitem_cast<FeedBackBuffer *>(item);
         if (!node)
             continue;
 
@@ -132,7 +128,7 @@ void Buffer::calculateForces()
 //! [6]
 
 //! [7]
-bool Buffer::advance()
+bool FeedBackBuffer::advance()
 {
     if (newPos == pos())
         return false;
@@ -143,16 +139,16 @@ bool Buffer::advance()
 //! [7]
 
 //! [8]
-QRectF Buffer::boundingRect() const
+QRectF FeedBackBuffer::boundingRect() const
 {
     const int cellW = 30;
     return QRectF( 0, 0,
-                  cellW, cellW*buffer_size> 600? 603: cellW*buffer_size + 3);
+                  cellW*buffer_size> 600? 603: cellW*buffer_size + 3, cellW);
 }
 //! [8]
 
 //! [9]
-QPainterPath Buffer::shape() const
+QPainterPath FeedBackBuffer::shape() const
 {
     QPainterPath path;
     path.addRect(boundingRect());
@@ -162,7 +158,7 @@ QPainterPath Buffer::shape() const
 //! [9]
 
 #include <QDebug>
-void Buffer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void FeedBackBuffer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
 
     const int cellW = 30;
@@ -195,13 +191,13 @@ void Buffer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         }else{
             painter->setBrush(gradient);
         }
-        painter->drawRect(0, i*cellH, cellW, (i+1)*cellH);
+        painter->drawRect(i*cellH, 0, cellW, (i+1)*cellH);
     }
 }
 //! [10]
 
 //! [11]
-QVariant Buffer::itemChange(GraphicsItemChange change, const QVariant &value)
+QVariant FeedBackBuffer::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (change) {
     case ItemPositionHasChanged:
@@ -218,82 +214,15 @@ QVariant Buffer::itemChange(GraphicsItemChange change, const QVariant &value)
 //! [11]
 
 //! [12]
-void Buffer::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void FeedBackBuffer::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mousePressEvent(event);
-    signal->bufferMouseClicked(this);
 }
 
-void Buffer::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void FeedBackBuffer::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mouseReleaseEvent(event);
 }
 //! [12]
-
-void Buffer::loadData(QByteArray stego, QByteArray orig){
-    work.clear();
-    work.append(stego);
-    origin.clear();
-    origin.append(orig);
-    diff.clear();
-    if(origin.size()>0)
-        for(int i =0; i<orig.size(); i++){
-            unsigned char diff_element = origin[i] - work[i];
-            diff.append(diff_element);
-        }
-
-}
-
-#include <QTableWidget>
-
-vBufferViewForm* Buffer::getBufferForm(){
-    if(bform == NULL){
-        bform = new vBufferViewForm;
-        bform->setWindowTitle("buffer(" + QString("%1").arg(getBufferSize())+")");
-    }
-
-    QTableWidget *table = bform->getTableWidget();
-    table->clear();
-    table->setRowCount(0);
-    table->setRowCount(buffer_size);
-
-    for(int i =0; i< buffer_size;i++){
-        unsigned int delta = abs(abs(work[i])- abs(origin[i]));
-
-        QTableWidgetItem* item1 = new QTableWidgetItem(QString("%1(%2)").arg(origin[i]).arg((unsigned char)origin[i]));
-        table->setItem(i, 0, item1);
-        QTableWidgetItem* item2 = new QTableWidgetItem(QString("%1(%2)").arg(work[i]).arg((unsigned char)work[i]));
-        table->setItem(i, 1, item2);
-
-        QTableWidgetItem* item3 = new QTableWidgetItem(QString("%1").arg(delta));
-        table->setItem(i, 2, item3);
-
-        if(delta){
-            item1->setBackgroundColor(Qt::red);
-            item2->setBackgroundColor(Qt::red);
-            item3->setBackgroundColor(Qt::red);
-        }
-    }
-
-    return bform;
-}
-
-bool Buffer::haveForm(){
-    if(bform == NULL)
-        return false;
-    if (bform->isHidden()){
-        delete bform;
-        bform = NULL;
-        return false;
-    }
-    return true;
-}
-
-int Buffer::getDiff(){
-    int result =0;
-    for(QByteArray::iterator it = diff.begin(); it!=diff.end(); ++it)
-        result+=*it;
-    return result;
-}

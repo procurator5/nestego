@@ -21,11 +21,14 @@ public:
 
      QByteArray getDiff(int size);
      QByteArray getBuffer(int size);
+     QByteArray getStegoBuffer(int size);
+     QByteArray getOriginBuffer(int size);
 public slots:
      /**
       * @brief Загрузить следующую порцию данных
       */
      void loadBuffer();
+     void moveBuffer(int size);
 signals:
 
 public slots:
@@ -75,7 +78,11 @@ protected:
     QFile fstego;
 
     QByteArray stego_buff;
+    QByteArray origin;
     QByteArray diff;
+
+private:
+    void isBuf(int size);
 };
 
 #endif // VIBUFFER_H

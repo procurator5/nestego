@@ -69,6 +69,21 @@ public:
 
     int trainFann(vIBuffer* buffer);
 
+    /**
+     * @brief Возвращает значение вычисления НС
+     * @param buffer Входные данные
+     * @return
+     */
+    int getResult(QByteArray buffer);
+
+    /**
+     * @brief Тренировка НС
+     * @param buffer Входные данные
+     * @param result Ожидаемый результат
+     * @return
+     */
+    int train(QByteArray buffer, int result);
+
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
 
@@ -80,6 +95,21 @@ public:
         return fann->getTrainResults();
     };
 
+    /**
+     * @brief saveAnalyse сохраняет настройки нейронной сети в файле
+     * @param filename имя файла
+     * @return результат сохранения
+     */
+    bool saveAnalyse(QString filename);
+
+    /**
+     * @brief loadAnalyseFromFile загрузка НС из файла
+     * @param filename -имя файла
+     * @return результат загрузки
+     */
+    bool loadAnalyseFromFile(QString filename);
+
+    void setTrainResult( int output_before_train, int output_after_train, int need_result);
 
     enum { Type = UserType + 1 };
     int type() const { return Type; }
@@ -115,6 +145,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *);
+
+    void setStructTrainResult(struct train_result step);
     
 private:
     QList<Edge *> edgeList;
