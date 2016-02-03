@@ -25,11 +25,24 @@ public:
     ~vProject();
 
 signals:
+    /**
+     * @brief Сигнал при возникновении ошибок работы с БД
+     */
+    void databaseError(QString);
 
 public slots:
 
+protected:
+
 private:
     QSqlDatabase *db;
+    const QString trainTableSql = "CREATE TABLE train_results(  \
+                id integer AUTOINCREMENT, \
+                output_before_train float, \
+                output_after_train float, \
+                need_result float, \
+                error1 boolean, \
+                error2 boolean);";
 
 };
 
