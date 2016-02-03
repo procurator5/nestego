@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Создаем пустой проект
 
     currentProject = new vProject;
+    loadSourceSection();
 }
 
 MainWindow::~MainWindow()
@@ -630,7 +631,7 @@ void MainWindow::loadSourceSection(){
         item->setText(2, "X");
         item->child(0)->setText(1, currentProject->getSorceParam("no_stego"));
         item->child(1)->setText(1, currentProject->getSorceParam("command"));
-        item->child(2)->setText(1, currentProject->getSorceParam("cache"));
+        item->child(2)->setText(1, currentProject->getSorceParam("cashe"));
         item->child(3)->setText(1, currentProject->getSorceParam("cashe_folder"));
 
 

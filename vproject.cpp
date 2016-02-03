@@ -53,6 +53,56 @@ QString vProject::getSorceParam(QString key){
         return "undef";
     }
 
-    sql.next();
+    if(!sql.next())
+        return "";
     return sql.value(0).toString();
+}
+
+bool vProject::setSourceParam(QString key, QString value){
+    //Проверяем, есть ли параметр в базе
+    QSqlQuery query;
+    query.prepare("select count(*) from stego_source where key=:key;");
+    query.bindValue(":key", key);
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return false;
+    }
+    if(!query.next())
+        return false;
+
+    int value_count=query.value(0).toInt();
+    if(value_count == 0){
+        query.exec("INSERT INTO stego_source VALUES(:key, :value);");
+        query.bindValue(":key", key);
+        query.bindValue(":value", value);
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            return false;
+        }
+    }else if(value_count == 1){
+        query.exec("UPDATE stego_source set value=:value where key=:key;");
+        query.bindValue(":key", key);
+        query.bindValue(":value", value);
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            return false;
+        }
+    }else{
+        query.exec("DELETE FROM stego_source WHERE key=:key;");
+        query.bindValue(":key", key);
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            return false;
+        }
+
+        query.exec("INSERT INTO stego_source VALUES(:key, :value);");
+        query.bindValue(":key", key);
+        query.bindValue(":value", value);
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            return false;
+        }
+
+    }
+    return true;
 }
