@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Создаем пустой проект
 
     vProject *prj = new vProject;
+    qDebug()<<prj->getSorceParam("type");
 }
 
 MainWindow::~MainWindow()

@@ -2,6 +2,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QDebug>
 
 vProject::vProject(QObject *parent) :
@@ -13,6 +14,10 @@ vProject::vProject(QObject *parent) :
     //Разметка БД
     if (db.open()) {
         QSqlQuery sql;
+        if(!sql.exec("drop table if exists stego_source;"))
+            emit databaseError(sql.lastError().text());
+        if(!sql.exec("drop table if exists train_results;"))
+            emit databaseError(sql.lastError().text());
         if(!sql.exec(trainTableSql))
             emit databaseError(sql.lastError().text());
         if(!sql.exec(stegoSourceTableSql))
@@ -37,4 +42,17 @@ vProject::~vProject(){
 
 void vProject::debugDB(QString err){
     qDebug()<<err;
+}
+
+QString vProject::getSorceParam(QString key){
+    QSqlQuery sql;
+    sql.prepare("SELECT value FROM stego_source where key=:key;");
+    sql.bindValue(":key", key);
+    if (!sql.exec()) {
+        emit databaseError(sql.lastError().text());
+        return "undef";
+    }
+
+    sql.next();
+    return sql.value(0).toString();
 }
