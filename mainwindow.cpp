@@ -11,7 +11,7 @@
 #include "vabufferform.h"
 #include "vanalyserform.h"
 #include "vedgedialog.h"
-#include "vproject.h"
+
 
 
 
@@ -61,8 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Создаем пустой проект
 
-    vProject *prj = new vProject;
-    qDebug()<<prj->getSorceParam("type");
+    currentProject = new vProject;
 }
 
 MainWindow::~MainWindow()
@@ -617,5 +616,33 @@ void MainWindow::showBufferData(Buffer *buf){
     vBufferViewForm *bvf = buf->getBufferForm();
     if(!showForm)
         QGraphicsProxyWidget *proxy = scene.addWidget(bvf, Qt::Window);
+
+}
+
+void MainWindow::loadSourceSection(){
+    //Определяем тип контрольного примера
+    if(currentProject->getSorceParam("type")=="program"){
+        QTreeWidgetItem * item = ui->treeWidget->topLevelItem(0);
+        item->setText(3, "X");
+        QFont font = item->font(0);
+        font.setBold(true);
+        item->setFont(0,font);
+        item->setText(2, "X");
+        item->child(0)->setText(1, currentProject->getSorceParam("no_stego"));
+        item->child(1)->setText(1, currentProject->getSorceParam("command"));
+        item->child(2)->setText(1, currentProject->getSorceParam("cache"));
+        item->child(3)->setText(1, currentProject->getSorceParam("cashe_folder"));
+
+
+    }else{
+        QTreeWidgetItem * item = ui->treeWidget->topLevelItem(1);
+        item->setText(3, "X");
+        QFont font = item->font(0);
+        font.setBold(true);
+        item->setFont(0,font);
+        item->setText(2, "X");
+        item->child(0)->setText(1, currentProject->getSorceParam("no_stego"));
+        item->child(1)->setText(1, currentProject->getSorceParam("stego"));
+    }
 
 }

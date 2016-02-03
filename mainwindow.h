@@ -15,6 +15,7 @@
 #include "feedbackbuffer.h"
 
 #include "csignal.h"
+#include "vproject.h"
 
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
@@ -90,6 +91,11 @@ private slots:
 
     void on_action_Debug_triggered();
 
+    /**
+     * @brief Загружаются базовые данные из БД проекта
+     */
+    void loadSourceSection();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene scene;
@@ -113,6 +119,8 @@ private:
     QwtPlotCurve* error2;
 
     Analyse *getAnalyseByName(QString name);
+
+    vProject *currentProject;
 
 };
 
