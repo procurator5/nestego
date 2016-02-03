@@ -11,6 +11,7 @@
 #include "vabufferform.h"
 #include "vanalyserform.h"
 #include "vedgedialog.h"
+#include "vproject.h"
 
 
 
@@ -58,10 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QPen pen_error2(Qt::yellow);
     error2->setPen(pen_error2);
 
-    //Готовим БД SQLite для записи результатов
+    //Создаем пустой проект
 
-
-
+    vProject *prj = new vProject;
 }
 
 MainWindow::~MainWindow()

@@ -31,18 +31,23 @@ signals:
     void databaseError(QString);
 
 public slots:
+    void debugDB(QString);
 
 protected:
 
 private:
-    QSqlDatabase *db;
+    QSqlDatabase db;
     const QString trainTableSql = "CREATE TABLE train_results(  \
-                id integer AUTOINCREMENT, \
-                output_before_train float, \
-                output_after_train float, \
-                need_result float, \
+                id integer PRIMARY KEY AUTOINCREMENT, \
+                output_before_train real, \
+                output_after_train real, \
+                need_result real, \
                 error1 boolean, \
                 error2 boolean);";
+
+    const QString stegoSourceTableSql = "CREATE TABLE stego_source(\
+            key varchar(20), \
+            value varchar(2000));";
 
 };
 
