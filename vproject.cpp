@@ -72,7 +72,7 @@ bool vProject::setSourceParam(QString key, QString value){
 
     int value_count=query.value(0).toInt();
     if(value_count == 0){
-        query.exec("INSERT INTO stego_source VALUES(:key, :value);");
+        query.prepare("INSERT INTO stego_source VALUES(:key, :value);");
         query.bindValue(":key", key);
         query.bindValue(":value", value);
         if(!query.exec()){
@@ -80,7 +80,7 @@ bool vProject::setSourceParam(QString key, QString value){
             return false;
         }
     }else if(value_count == 1){
-        query.exec("UPDATE stego_source set value=:value where key=:key;");
+        query.prepare("UPDATE stego_source set value=:value where key=:key;");
         query.bindValue(":key", key);
         query.bindValue(":value", value);
         if(!query.exec()){
@@ -88,14 +88,14 @@ bool vProject::setSourceParam(QString key, QString value){
             return false;
         }
     }else{
-        query.exec("DELETE FROM stego_source WHERE key=:key;");
+        query.prepare("DELETE FROM stego_source WHERE key=:key;");
         query.bindValue(":key", key);
         if(!query.exec()){
             emit databaseError(query.lastError().text());
             return false;
         }
 
-        query.exec("INSERT INTO stego_source VALUES(:key, :value);");
+        query.prepare("INSERT INTO stego_source VALUES(:key, :value);");
         query.bindValue(":key", key);
         query.bindValue(":value", value);
         if(!query.exec()){

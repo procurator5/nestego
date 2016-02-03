@@ -43,9 +43,9 @@ public slots:
 private slots:
     void on_action_addAnalyze_triggered();
 
-    void on_treeWidget_doubleClicked(const QModelIndex &index);
-
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
+    void slot_projectItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
 
     void on_action_saveProject_triggered();
 
@@ -92,9 +92,14 @@ private slots:
     void on_action_Debug_triggered();
 
     /**
-     * @brief Загружаются базовые данные из БД проекта
+     * @brief Загружаются базовые данные в виджет из БД проекта
      */
     void loadSourceSection();
+
+    /**
+     * @brief Сохраняются базовые данные из виджета в БД
+     */
+    void saveSourceSection();
 
 private:
     Ui::MainWindow *ui;

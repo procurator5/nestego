@@ -12,9 +12,6 @@
 #include "vanalyserform.h"
 #include "vedgedialog.h"
 
-
-
-
 extern CSignal *signal;
 
 
@@ -63,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     currentProject = new vProject;
     loadSourceSection();
+
+    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
+                           SLOT(slot_projectItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 }
 
 MainWindow::~MainWindow()
@@ -83,10 +83,6 @@ void MainWindow::on_action_addAnalyze_triggered()
         nodeList.append(node);
 
     }
-}
-
-void MainWindow::on_treeWidget_doubleClicked(const QModelIndex &index)
-{
 }
 
 void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
@@ -430,7 +426,6 @@ void MainWindow::on_action_addEdge_triggered()
 }
 
 void MainWindow::logInfo(int lev, QString message){
-    Level level = (Level) lev;
     ui->textBrowser->append(message);
 
 }
@@ -556,7 +551,7 @@ void MainWindow::on_action_feedBackBuffer_triggered()
     vABufferForm bf(this);
     bf.exec();
 
-    FeedBackBuffer *buffer = bf.returnFeedBackBuffer(ui->graphicsView);
+    bf.returnFeedBackBuffer(ui->graphicsView);
 }
 
 void MainWindow::on_action_Debug_triggered()
@@ -616,7 +611,7 @@ void MainWindow::showBufferData(Buffer *buf){
     bool showForm = buf->haveForm();
     vBufferViewForm *bvf = buf->getBufferForm();
     if(!showForm)
-        QGraphicsProxyWidget *proxy = scene.addWidget(bvf, Qt::Window);
+        scene.addWidget(bvf, Qt::Window);
 
 }
 
@@ -646,4 +641,26 @@ void MainWindow::loadSourceSection(){
         item->child(1)->setText(1, currentProject->getSorceParam("stego"));
     }
 
+}
+
+void MainWindow::saveSourceSection(){
+    if(ui->treeWidget->topLevelItem(0)->text(2)=="X"){
+        currentProject->setSourceParam("type", "program");
+        QTreeWidgetItem * item = ui->treeWidget->topLevelItem(0);
+        currentProject->setSourceParam("no_stego", item->child(0)->text(1));
+        currentProject->setSourceParam("command", item->child(1)->text(1));
+        currentProject->setSourceParam("cache", item->child(2)->text(1));
+        currentProject->setSourceParam("cashe_folder", item->child(3)->text(1));
+
+    }else{
+        currentProject->setSourceParam("type", "example");
+        QTreeWidgetItem * item = ui->treeWidget->topLevelItem(1);
+        currentProject->setSourceParam("no_stego", item->child(0)->text(1));
+        currentProject->setSourceParam("stego", item->child(0)->text(1));
+    }
+}
+
+void MainWindow::slot_projectItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous){
+
+    currentProject->setSourceParam(current->text(2), current->text(1));
 }

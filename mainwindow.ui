@@ -116,7 +116,7 @@
                  <string>undef</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>no_stego</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -130,7 +130,7 @@
                  <string>undef</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>command</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -143,6 +143,9 @@
                 <property name="text">
                  <string>true</string>
                 </property>
+                <property name="text">
+                 <string>cashe</string>
+                </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
                 </property>
@@ -153,6 +156,9 @@
                 </property>
                 <property name="text">
                  <string>cashe</string>
+                </property>
+                <property name="text">
+                 <string>cashe_folder</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -182,7 +188,7 @@
                  <string>undef</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>no_stego</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -196,7 +202,7 @@
                  <string>undef</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>stego</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -225,6 +231,9 @@
                 <property name="text">
                  <string>256</string>
                 </property>
+                <property name="text">
+                 <string>buffer_size</string>
+                </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
                 </property>
@@ -236,6 +245,9 @@
                 <property name="text">
                  <string>2</string>
                 </property>
+                <property name="text">
+                 <string>step</string>
+                </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
                 </property>
@@ -246,6 +258,9 @@
                 </property>
                 <property name="text">
                  <string>50</string>
+                </property>
+                <property name="text">
+                 <string>stego_percent</string>
                 </property>
                 <property name="flags">
                  <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
@@ -261,8 +276,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>408</width>
-             <height>371</height>
+             <width>210</width>
+             <height>170</height>
             </rect>
            </property>
            <attribute name="label">
@@ -358,8 +373,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>408</width>
-             <height>371</height>
+             <width>364</width>
+             <height>196</height>
             </rect>
            </property>
            <attribute name="label">
