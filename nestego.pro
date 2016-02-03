@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       +=sql
 LIBS += -lfann \
         -lqwt
 INCLUDEPATH += /usr/include/qwt
@@ -33,7 +34,8 @@ SOURCES += main.cpp\
     vtrainthread.cpp \
     vlibfannclass.cpp \
     feedbackbuffer.cpp \
-    vbufferviewform.cpp
+    vbufferviewform.cpp \
+    vproject.cpp
 
 HEADERS  += mainwindow.h \
     vneuralanalyse.h \
@@ -62,7 +64,8 @@ HEADERS  += mainwindow.h \
     vtrainthread.h \
     vlibfannclass.h \
     feedbackbuffer.h \
-    vbufferviewform.h
+    vbufferviewform.h \
+    vproject.h
 
 FORMS    += mainwindow.ui \
     vneuralanalyse.ui \

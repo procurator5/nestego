@@ -58,6 +58,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QPen pen_error2(Qt::yellow);
     error2->setPen(pen_error2);
 
+    //Готовим БД SQLite для записи результатов
+
+
+
 }
 
 MainWindow::~MainWindow()
