@@ -13,6 +13,7 @@
 #include "vedgedialog.h"
 
 extern CSignal *signal;
+extern vProject *currentProject;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -55,14 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     error2 = new QwtPlotCurve("Out before train");
     QPen pen_error2(Qt::yellow);
     error2->setPen(pen_error2);
-
-    //Создаем пустой проект
-
-    currentProject = new vProject;
-    loadSourceSection();
-
-    connect(ui->treeWidget, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this,
-                           SLOT(slot_projectItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 }
 
 MainWindow::~MainWindow()

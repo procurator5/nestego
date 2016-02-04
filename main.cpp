@@ -2,8 +2,11 @@
 #include <QApplication>
 
 #include "csignal.h"
+#include "vproject.h"
 
 CSignal *signal = new CSignal;
+vProject *currentProject =new vProject;
+
 
 int main(int argc, char *argv[])
 {

@@ -125,8 +125,6 @@ private:
 
     Analyse *getAnalyseByName(QString name);
 
-    vProject *currentProject;
-
 };
 
 #endif // MAINWINDOW_H
