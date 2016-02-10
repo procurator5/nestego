@@ -652,8 +652,3 @@ void MainWindow::saveSourceSection(){
         currentProject->setSourceParam("stego", item->child(0)->text(1));
     }
 }
-
-void MainWindow::slot_projectItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous){
-
-    currentProject->setSourceParam(current->text(2), current->text(1));
-}

@@ -45,8 +45,6 @@ private slots:
 
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
-    void slot_projectItemChanged(QTreeWidgetItem * current, QTreeWidgetItem * previous);
-
     void on_action_saveProject_triggered();
 
     void on_action_OpenProject_triggered();

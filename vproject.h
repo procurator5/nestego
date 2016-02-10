@@ -65,8 +65,23 @@ private:
                 error2 boolean);";
 
     const QString stegoSourceTableSql = "CREATE TABLE stego_source(\
-            key varchar(20), \
+            key varchar(20) PRIMARY KEY NOT NULL, \
             value varchar(2000));";
+
+    const QString stegoNodesTableSql = "CREATE TABLE nodes (\
+            node_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\
+            node_name TEXT NOT NULL,\
+            node_type INTEGER NOT NULL DEFAULT (1),\
+            x INTEGER NOT NULL DEFAULT (0),\
+            y INTEGER NOT NULL DEFAULT (0),\
+            node_data BLOB\
+        );";
+
+    const QString stegoNodeRelationTable = ("CREATE TABLE node_relations (\
+            node_relation_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\
+            node_relation_node1_id INTEGER,\
+            node_relation_node2_id INTEGER \
+        );" );
 
 };
 

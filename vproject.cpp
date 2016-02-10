@@ -18,9 +18,17 @@ vProject::vProject(QObject *parent) :
             emit databaseError(sql.lastError().text());
         if(!sql.exec("drop table if exists train_results;"))
             emit databaseError(sql.lastError().text());
+        if(!sql.exec("drop table if exists nodes;"))
+            emit databaseError(sql.lastError().text());
+        if(!sql.exec("drop table if exists node_relations;"))
+            emit databaseError(sql.lastError().text());
         if(!sql.exec(trainTableSql))
             emit databaseError(sql.lastError().text());
         if(!sql.exec(stegoSourceTableSql))
+            emit databaseError(sql.lastError().text());
+        if(!sql.exec(stegoNodesTableSql))
+            emit databaseError(sql.lastError().text());
+        if(!sql.exec(stegoNodeRelationTable))
             emit databaseError(sql.lastError().text());
 
         //Добавляем "Значения по умолчанию"
