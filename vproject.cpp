@@ -31,7 +31,6 @@ vProject::vProject(QObject *parent) :
 
     }else{
         QSqlError err = db.lastError();
-        qDebug()<<err.ConnectionError;
         emit databaseError(db.lastError().text());
     }
 }

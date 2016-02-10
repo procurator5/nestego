@@ -1,10 +1,12 @@
 #include "vlineeditdelegate.h"
 #include <QLineEdit>
-#include <QDebug>
 #include <QSpinBox>
 #include <QCheckBox>
 
 #include "vchoosedirectory.h"
+#include "vproject.h"
+
+extern vProject *currentProject;
 
 vLineEditDelegate::vLineEditDelegate(QObject *parent) :
     QItemDelegate(parent)
@@ -39,9 +41,12 @@ void vLineEditDelegate::destroyEditor(QWidget * editor, const QModelIndex & inde
 
 void vLineEditDelegate::setModelData ( QWidget * editor, QAbstractItemModel * model, const QModelIndex & index ) const{
 
+    QString keyIndex = model->index( index.row(), 2, index.parent()).data().toString();
+
     if (index.parent().row()==0 && index.row() ==1){
         QLineEdit *le = (QLineEdit*) editor;
         model->setData(index, QVariant(le->text()));
+        currentProject->setSourceParam(keyIndex, le->text());
         return;
     }
     if (index.parent().row()==0 && index.row() ==2){
@@ -52,11 +57,15 @@ void vLineEditDelegate::setModelData ( QWidget * editor, QAbstractItemModel * mo
     if(index.parent().row() == 2){
         QSpinBox *sb = (QSpinBox*) editor;
         model->setData(index, QVariant(sb->value()));
+        currentProject->setSourceParam(keyIndex, QString::number(sb->value()));
         return;
     }
 
     vChooseDirectory* vcd = (vChooseDirectory*) editor;
     model->setData(index, QVariant(vcd->getText()));
+
+    //Записыаем соответствующее значение в БД
+    currentProject->setSourceParam(keyIndex, vcd->getText());
 
 }
 
