@@ -1,7 +1,8 @@
 #include "vabufferform.h"
 #include "ui_vabufferform.h"
+#include "vproject.h"
 
-#include <QDebug>
+extern vProject* currentProject;
 
 vABufferForm::vABufferForm(QWidget *parent) :
     QDialog(parent),
@@ -22,6 +23,7 @@ Buffer* vABufferForm::returnElement(QGraphicsView *view){
     QGraphicsScene *scene = view->scene();
     scene->addItem(buf);
     buf->setPos(-50, -50);
+    currentProject->saveBuffer("Buffer"+QString::number(ui->spinBox->value()), ui->spinBox->value());
     return buf;
 }
 

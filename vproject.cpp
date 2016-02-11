@@ -122,3 +122,46 @@ bool vProject::setSourceParam(QString key, QString value){
     }
     return true;
 }
+
+int vProject::saveNode(QString node_name, QString type, int x, int y){
+    QSqlQuery query;
+    query.prepare("insert into nodes ( node_name, node_type_id, x, y )\
+               select :node_name, node_type_id, :x, :y from \
+                      node_types where node_type_name = :type;");
+    query.bindValue(":node_name", node_name);
+    query.bindValue(":x", x);
+    query.bindValue(":y", y);
+    query.bindValue(":type", type);
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return -1;
+    }
+    return query.lastInsertId().toInt();
+}
+
+int vProject::saveBuffer(QString node_name, int buffer_size, int x, int y){
+    int rowid = saveNode(node_name, "buffer", x,y);
+    if(rowid>0){
+        QSqlQuery query;
+        query.prepare("update nodes set node_data=:data where node_id=:rowid;");
+        query.bindValue(":data",  buffer_size);
+        query.bindValue(":rowid", rowid);
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            deleteNode(node_name);
+            return -1;
+        }
+    }
+    return rowid;
+}
+
+bool vProject::deleteNode(QString node_name){
+    QSqlQuery query;
+    query.prepare("delete from nodes where node_name=:node_name;");
+    query.bindValue(":node_name", node_name);
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return false;
+    }
+    return false;
+}

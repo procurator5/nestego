@@ -43,6 +43,23 @@ public:
      */
     bool setSourceParam(QString key, QString value);
 
+    /**
+     * @brief Сохраняет информацию о добавленном буфере (исходные данные для анализа)
+     * @param node_name имя ноды (уникальное?)
+     * @param buffer_size размерность буфера
+     * @param x - расположение на экране по х
+     * @param y - расположение на экране по y
+     * @return id добавленной записи
+     */
+    int saveBuffer(QString node_name, int buffer_size, int x = -50, int y = -50);
+
+    /**
+     * @brief deleteNode Удаление ноды
+     * @param node_name Имя ноды
+     * @return Результат удаления ноды
+     */
+    bool deleteNode(QString node_name);
+
 signals:
     /**
      * @brief Сигнал при возникновении ошибок работы с БД
@@ -53,6 +70,15 @@ public slots:
     void debugDB(QString);
 
 protected:
+    /**
+     * @brief Сохраняет информацию об очередном блоке сети
+     * @param node_name имя ноды (уникальное?)
+     * @param type - тип ноды: буфер, нейросеть, выходной параметр
+     * @param x - расположение на экране по х
+     * @param y - расположение на экране по y
+     * @return id добавленной записи
+     */
+    int saveNode(QString node_name, QString type, int x, int y);
 
 private:
     QSqlDatabase db;
