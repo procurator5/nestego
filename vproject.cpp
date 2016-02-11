@@ -18,13 +18,17 @@ vProject::vProject(QObject *parent) :
             emit databaseError(sql.lastError().text());
         if(!sql.exec("drop table if exists train_results;"))
             emit databaseError(sql.lastError().text());
+        if(!sql.exec("drop table if exists node_relations;"))
+            emit databaseError(sql.lastError().text());
         if(!sql.exec("drop table if exists nodes;"))
             emit databaseError(sql.lastError().text());
-        if(!sql.exec("drop table if exists node_relations;"))
+        if(!sql.exec("drop table if exists node_types;"))
             emit databaseError(sql.lastError().text());
         if(!sql.exec(trainTableSql))
             emit databaseError(sql.lastError().text());
         if(!sql.exec(stegoSourceTableSql))
+            emit databaseError(sql.lastError().text());
+        if(!sql.exec(stegoNodeTypeTable))
             emit databaseError(sql.lastError().text());
         if(!sql.exec(stegoNodesTableSql))
             emit databaseError(sql.lastError().text());
@@ -37,8 +41,13 @@ vProject::vProject(QObject *parent) :
         sql.exec("INSERT INTO stego_source VALUES('command', 'undef');");
         sql.exec("INSERT INTO stego_source VALUES('cashe', 'false');");
 
+        sql.exec("insert into node_types values(1, 'buffer');");
+        sql.exec("insert into node_types values(2, 'fann');");
+        sql.exec("insert into node_types values(3, 'brain');");
+
+        sql.exec("insert into nodes (node_name, node_type_id, x, y)values('Brain', 3, 0, 0);");
+
     }else{
-        QSqlError err = db.lastError();
         emit databaseError(db.lastError().text());
     }
 }
