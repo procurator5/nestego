@@ -60,6 +60,35 @@ public:
      */
     bool deleteNode(QString node_name);
 
+    /**
+     * @brief Изменении координат ноды в БД при ее перемещении
+     * @param node_name имя ноды (уникальное?)
+     * @param x - расположение на экране по х
+     * @param y - расположение на экране по y
+     * @return
+     */
+    bool moveNode(QString node_name, int x, int y);
+
+    /**
+     * @brief Изменении координат ноды в БД при ее перемещении
+     * @param x - расположение на экране по х
+     * @param y - расположение на экране по y
+     */
+    bool getBrainCoords(int &x, int &y);
+
+    /**
+     * @brief Получение списков нод
+     * @return Список наименований буфферов обмена
+     */
+    QList <QString> getBuffers();
+
+    /**
+     * @brief Получение размера буфера
+     * @param buffer_name - имя буфера
+     * @return размер буфера
+     */
+    int getBufferSize(QString buffer_name);
+
 signals:
     /**
      * @brief Сигнал при возникновении ошибок работы с БД
@@ -105,8 +134,9 @@ private:
 
     const QString stegoNodeRelationTable = ("CREATE TABLE node_relations (\
             node_relation_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\
-            node_relation_node1_id INTEGER,\
-            node_relation_node2_id INTEGER \
+            node_relation_node1_id INTEGER NOT NULL,\
+            node_relation_node2_id INTEGER NOT NULL,\
+            weigth real NOT NULL DEFAULT(1.0)\
         );" );
 
     const QString stegoNodeTypeTable = ("CREATE TABLE node_types ( \

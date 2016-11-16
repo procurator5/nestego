@@ -46,6 +46,9 @@
 
 #include "edge.h"
 #include "brain.h"
+#include "vproject.h"
+
+extern vProject *currentProject;
 
 //! [0]
 Brain::Brain(QGraphicsView *graphWidget)
@@ -206,3 +209,11 @@ void Brain::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseReleaseEvent(event);
 }
 //! [12]
+
+void Brain::loadFromProject(){
+    int x =0;
+    int y =0;
+    currentProject->getBrainCoords(x, y);
+
+    setPos((qreal)x, (qreal)y);
+}

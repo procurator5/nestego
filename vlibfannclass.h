@@ -77,6 +77,8 @@ public:
 
         trains.append(thread->getTrainResults());
 
+        return trains;
+
     };
 
     void setTrainResult(struct train_result step);

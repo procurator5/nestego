@@ -40,7 +40,8 @@ bool vIBuffer::setFile(){
         //Открываем/создаем стегоконтейнер
         if(type == tExample){
             fstego.setFileName(stego + "/" +fl.at(pos).fileName());
-            if(fstego.open(QIODevice::ReadOnly))
+            if(!fstego.open(QIODevice::ReadOnly))
+                signal->logMessage(CRITICAL, QString::fromLocal8Bit("Недоступен стего-контейнер. Имя контейнера: %1. Err: %2").arg(stego + "/" +fl.at(pos).fileName()).arg(fstego.errorString()));
                 return false;
         }else if(type == tCommand){
             if(QFile::exists(cashe_folder + "/" + fl.at(pos).fileName())&& cashing==true){

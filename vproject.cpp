@@ -14,7 +14,7 @@ vProject::vProject(QObject *parent) :
     //Разметка БД
     if (db.open()) {
         QSqlQuery sql;
-        if(!sql.exec("drop table if exists stego_source;"))
+/*        if(!sql.exec("drop table if exists stego_source;"))
             emit databaseError(sql.lastError().text());
         if(!sql.exec("drop table if exists train_results;"))
             emit databaseError(sql.lastError().text());
@@ -46,7 +46,7 @@ vProject::vProject(QObject *parent) :
         sql.exec("insert into node_types values(3, 'brain');");
 
         sql.exec("insert into nodes (node_name, node_type_id, x, y)values('Brain', 3, 0, 0);");
-
+*/
     }else{
         emit databaseError(db.lastError().text());
     }
@@ -164,4 +164,72 @@ bool vProject::deleteNode(QString node_name){
         return false;
     }
     return false;
+}
+
+bool vProject::moveNode(QString node_name, int x, int y){
+    QSqlQuery query;
+    query.prepare("update nodes set x=:x, y=:y where node_name=:node_name;");
+    query.bindValue(":x", x);
+    query.bindValue(":y", y);
+    query.bindValue(":node_name", node_name);
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return false;
+    }
+    return false;
+}
+
+bool vProject::getBrainCoords(int &x, int &y){
+    //Получаем координаты brain
+    x=0;
+    y=0;
+    QSqlQuery query;
+    query.prepare("select x, y from nodes where node_type_id=3;");
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return false;
+    }
+    if(!query.next()){
+        query.prepare("insert into nodes ( node_name, node_type_id, x, y )\
+                   values('Brain', 3,0,0)");
+        if(!query.exec()){
+            emit databaseError(query.lastError().text());
+            return false;
+        }
+        return false;
+    }
+
+    x=query.value(0).toInt();
+    x=query.value(1).toInt();
+    return true;
+}
+
+
+QList <QString> vProject::getBuffers(){
+    QList <QString> listNodes;
+    QSqlQuery query;
+    query.prepare("select node_name from nodes where node_type_id=1;");
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return listNodes;
+    }
+
+    while(query.next()){
+        listNodes.append(query.value(0).toString());
+    }
+    return listNodes;
+}
+
+int vProject::getBufferSize(QString buffer_name){
+    QSqlQuery query;
+    query.prepare("select node_data from nodes where node_name=:name;");
+    query.bindValue(":name", buffer_name);
+    if(!query.exec()){
+        emit databaseError(query.lastError().text());
+        return 0;
+    }
+    if(!query.next())
+        return 0;
+
+    return query.value(0).toInt();
 }

@@ -70,6 +70,12 @@ public:
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    /**
+     * @brief Загрузка местоположения конечной точки из БД проекта
+     * @return Результат загрузки данных
+     */
+    void loadFromProject();
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 

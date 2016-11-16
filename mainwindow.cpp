@@ -56,6 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     error2 = new QwtPlotCurve("Out before train");
     QPen pen_error2(Qt::yellow);
     error2->setPen(pen_error2);
+
+    //Тестим загрузку
+    loadSourceSection();
 }
 
 MainWindow::~MainWindow()
@@ -121,7 +124,7 @@ void MainWindow::on_action_saveProject_triggered()
         settings.setValue("type", "example");
         QTreeWidgetItem * item = ui->treeWidget->topLevelItem(1);
         settings.setValue("no_stego", item->child(0)->text(1));
-        settings.setValue("stego", item->child(0)->text(1));
+        settings.setValue("stego", item->child(1)->text(1));
     }
 
     settings.endGroup();
@@ -632,6 +635,22 @@ void MainWindow::loadSourceSection(){
         item->setText(2, "X");
         item->child(0)->setText(1, currentProject->getSorceParam("no_stego"));
         item->child(1)->setText(1, currentProject->getSorceParam("stego"));
+    }
+
+    //Загружаем ноды из файла
+    brain->loadFromProject();
+
+    //Загружаем буферы
+    QList <QString> listNodes = currentProject->getBuffers();
+
+    for(QList <QString>::iterator it = listNodes.begin(); it!=listNodes.end(); ++it){
+        qDebug()<<*it;
+        Buffer* buf = new Buffer(ui->graphicsView);
+        buf->setBufferSize(currentProject->getBufferSize(*it));
+        scene.addItem(buf);
+       // buf->setPos(settings.value("x").toReal(), settings.value("y").toReal() );
+        //
+
     }
 
 }
