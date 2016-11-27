@@ -7,8 +7,8 @@
 QT       += core gui
 QT       +=sql
 LIBS += -lfann \
-        -lqwt
-INCLUDEPATH += /usr/include/qwt
+        -lqwt-qt4
+INCLUDEPATH += /usr/include/qwt-qt4
 
 QT += widgets
 

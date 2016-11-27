@@ -96,13 +96,14 @@ void vIBuffer::loadConfigurationFromWidget(QTreeWidget *infoWidget){
 #include <QDebug>
 
 void vIBuffer::loadBuffer(){
-    if(seek<buffer_size)
-        return;
-
     if(!fstego.isOpen()){
         setFile();
         seek = 0;
     }
+
+/*    if(seek<buffer_size)
+        return;
+*/
     origin = forig.read(buffer_size);
     stego_buff = fstego.read(buffer_size);
 

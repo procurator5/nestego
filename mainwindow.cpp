@@ -465,10 +465,10 @@ void MainWindow::showTrainPlot(Analyse *an){
     error1->setData(x, error1_vector);
     error2->setData(x, error2_vector);
 */
-    output_before_train->setSamples(x, output_before_train_vector);
-    need_result->setSamples(x, need_result_vector);
-    error1->setSamples(x, error1_vector);
-    error2->setSamples(x, error2_vector);
+    output_before_train->setData(x, output_before_train_vector);
+    need_result->setData(x, need_result_vector);
+    error1->setData(x, error1_vector);
+    error2->setData(x, error2_vector);
 
     output_before_train->attach(ui->qwtPlot);
     need_result->attach(ui->qwtPlot);

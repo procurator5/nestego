@@ -14,7 +14,7 @@ vProject::vProject(QObject *parent) :
     //Разметка БД
     if (db.open()) {
         QSqlQuery sql;
-/*        if(!sql.exec("drop table if exists stego_source;"))
+        if(!sql.exec("drop table if exists stego_source;"))
             emit databaseError(sql.lastError().text());
         if(!sql.exec("drop table if exists train_results;"))
             emit databaseError(sql.lastError().text());
@@ -46,7 +46,7 @@ vProject::vProject(QObject *parent) :
         sql.exec("insert into node_types values(3, 'brain');");
 
         sql.exec("insert into nodes (node_name, node_type_id, x, y)values('Brain', 3, 0, 0);");
-*/
+
     }else{
         emit databaseError(db.lastError().text());
     }

@@ -17,8 +17,8 @@
 #include "csignal.h"
 #include "vproject.h"
 
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_plot_curve.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
 
 namespace Ui {
 class MainWindow;
